@@ -1,5 +1,8 @@
 import type { DefaultSession } from "next-auth";
-import type { Role } from "@/generated/prisma/enums";
+
+// User.role is a plain string column in the DB (see prisma/schema.prisma),
+// constrained by app logic to these two values.
+type Role = "user" | "admin";
 
 declare module "next-auth" {
   interface User {
