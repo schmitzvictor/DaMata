@@ -22,6 +22,10 @@ export type PaymentPreference = {
  * `input.total`/`input.method`/`input.customerEmail`, and return the real
  * preference id + `init_point`. Keep the return shape so
  * `app/checkout/actions.ts` doesn't need to change.
+ *
+ * IMPORTANT for the real implementation: set `external_reference` on the
+ * preference to `String(input.orderId)`. `api/webhooks/mercadopago` matches
+ * incoming payment notifications back to an `Order` by that field.
  */
 export async function createPaymentPreference(
   input: CreatePaymentInput,

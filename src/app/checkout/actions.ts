@@ -69,6 +69,9 @@ export async function createOrderAction(input: CreateOrderInput) {
     size: variant.size,
     quantity,
     price: variant.product.price,
+    // Snapshot for the ERP stock-movement notification on payment
+    // confirmation (see api/webhooks/mercadopago). Null if never synced.
+    erpVariantId: variant.erpVariantId,
   }));
 
   const subtotal = orderItemsData.reduce(

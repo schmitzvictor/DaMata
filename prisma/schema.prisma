@@ -24,6 +24,11 @@ model Product {
   weightGrams Int? // necessário para cálculo de frete (Melhor Envio)
   createdAt   DateTime         @default(now())
   variants    ProductVariant[]
+
+  // ERP é a fonte da verdade para estoque/preço/nome/categoria. Nulo até o
+  // primeiro sync (POST /api/sync/product). description/images/featured
+  // continuam editáveis aqui (admin de conteúdo) e nunca são tocados pelo sync.
+  erpProductId String? @unique
 }
 
 model ProductVariant {
@@ -33,6 +38,9 @@ model ProductVariant {
   size      String
   color     String?
   stock     Int     @default(0)
+
+  // Ver nota em Product.erpProductId — mesmo contrato, por variante.
+  erpVariantId String? @unique
 }
 
 model Order {
@@ -69,6 +77,12 @@ model OrderItem {
   size        String
   quantity    Int
   price       Float
+
+  // Snapshot do ProductVariant.erpVariantId no momento do pedido (mesmo
+  // padrão de productName/price). É o que identifica o item pro ERP quando
+  // o webhook de pagamento confirma a venda e registra a saída de estoque.
+  // Nulo se o produto nunca foi sincronizado com o ERP.
+  erpVariantId String?
 }
 
 model Post {
