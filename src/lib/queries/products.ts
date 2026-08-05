@@ -30,9 +30,18 @@ export function getLaunches(limit = 4) {
 
 export type CategoryLink = { slug: string; label: string };
 
-/** Distinct product categories, for nav/mega-menu and PLP routing. */
+/** Distinct product categories, for nav/mega-menu and PLP routing.
+ *  Used from the root layout, so it runs on every page (including static
+ *  prerendering of special pages like /_not-found at build time) — a DB
+ *  outage here must degrade to an empty nav, not fail the whole build. */
 export async function getCategories(): Promise<CategoryLink[]> {
-  const rows = await prisma.product.groupBy({ by: ["category"] });
+  let rows;
+  try {
+    rows = await prisma.product.groupBy({ by: ["category"] });
+  } catch (err) {
+    console.error("getCategories: DB query failed, falling back to []", err);
+    return [];
+  }
   return rows
     .map((r) => ({ slug: slugify(r.category), label: r.category }))
     .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
