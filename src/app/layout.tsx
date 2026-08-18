@@ -41,6 +41,12 @@ export const metadata: Metadata = {
   description: "Moda outdoor com serigrafia artesanal.",
 };
 
+// Todo o app depende de estoque/preço/categoria vindos do sync do ERP —
+// prerender estático serviria dado velho pro cliente. Também evita que
+// `next build` tente conectar no banco (não há um alcançável nesse momento
+// do Docker build).
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{

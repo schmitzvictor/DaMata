@@ -1,0 +1,37 @@
+services:
+  # Roda "prisma migrate deploy" e sai — o serviço "app" só sobe depois que
+  # este terminar com sucesso. Não é um servidor de longa duração.
+  migrate:
+    build:
+      context: .
+      target: migrate
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    networks:
+      - damata
+
+  app:
+    build:
+      context: .
+      target: runner
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    # Nginx faz o proxy reverso (com TLS) — o app só escuta em loopback.
+    # Porta 3001 (não 3000) pra não colidir com o ERP na mesma VM.
+    ports:
+      - "127.0.0.1:3001:3000"
+    networks:
+      - damata
+
+networks:
+  # Externa, criada uma vez na VM (`docker network create damata`) e
+  # compartilhada com o stack do ERP — é lá que o serviço "db" (Postgres)
+  # vive de verdade. Ver README.md e o README.md do repo do ERP.
+  damata:
+    external: true

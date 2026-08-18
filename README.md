@@ -11,7 +11,7 @@ prompts seguintes.
 - **Next.js 16** (App Router, TypeScript, Turbopack)
 - **Tailwind CSS v4** — tokens de marca em [`tailwind.config.ts`](./tailwind.config.ts)
 - **shadcn/ui** (Radix) — componentes base em `src/components/ui`
-- **Prisma 7** → PostgreSQL (Neon/Supabase)
+- **Prisma 7** → PostgreSQL (self-hosted na VM em produção, mesmo Postgres do ERP; Neon em dev/local)
 - **Auth.js (NextAuth v5)** — login por credentials (e-mail/senha com bcrypt), papéis `user`/`admin`
 
 ### Cores da marca
@@ -62,8 +62,8 @@ Preencha pelo menos `DATABASE_URL` e gere um `AUTH_SECRET`:
 npx auth secret
 ```
 
-As demais variáveis (Mercado Pago, Melhor Envio, Cloudinary/Supabase Storage, Resend)
-podem ficar em branco por enquanto — só serão usadas em prompts futuros.
+As demais variáveis (Mercado Pago, Melhor Envio, Cloudflare R2, Resend) podem
+ficar em branco por enquanto — só serão usadas em prompts futuros.
 
 ### 4. Aplicar o schema no banco
 
@@ -107,6 +107,69 @@ src/
   auth.ts                 # config do Auth.js (provider, callbacks)
 prisma/
   schema.prisma           # datasource + model User (só auth por enquanto)
+```
+
+## Deploy em produção (VM + Docker + Nginx)
+
+Mesma VM do ERP (repo separado), mesmo esquema: `docker-compose.yml` sobe
+`migrate` (roda `prisma migrate deploy` e sai) e `app` (o site, só acessível
+em `127.0.0.1:3001` — porta diferente da 3000 do ERP, mesma VM). Nginx faz o
+proxy reverso com TLS na frente.
+
+Este stack **não sobe seu próprio Postgres** — usa o mesmo container `db` do
+stack do ERP, via uma rede Docker externa chamada `damata`. Ou seja: **o
+stack do ERP precisa estar rodando primeiro**, com a rede `damata` já criada
+e a role/banco `damata_site` já existindo nele (ver README.md do repo do ERP,
+seção "Deploy em produção").
+
+```bash
+git clone <repo> damata-web && cd damata-web
+cp .env.example .env
+# edite o .env: gere AUTH_SECRET de verdade (npx auth secret), troque
+# POSTGRES_PASSWORD pra bater com a senha usada no CREATE ROLE damata_site
+# (ver README do ERP), AUTH_URL="https://damata.app", e preencha
+# MERCADO_PAGO_*/MELHOR_ENVIO_*/R2_*/RESEND_*/ERP_*. DATABASE_URL local não
+# importa aqui — o app dentro do compose usa o host "db" automaticamente.
+
+docker compose up -d --build
+```
+
+### Migrar dados do Neon (se já existirem produtos/pedidos reais)
+
+Se o banco atual no Neon já tem dados que importam, exporte antes de trocar
+o DNS e importe no Postgres novo (rodando na VM, já com o schema aplicado
+pelo `migrate` acima):
+
+```bash
+# na sua máquina, com o pg_dump instalado:
+pg_dump "$NEON_DATABASE_URL_UNPOOLED" --no-owner --no-privileges > dump.sql
+
+# copia pra VM e importa no banco damata_site
+scp dump.sql sua-vm:/tmp/dump.sql
+ssh sua-vm 'cd damata-erp && docker compose exec -T db psql -U damata_site -d damata_site < /tmp/dump.sql'
+```
+
+Se não tiver dados reais ainda (só o schema), pule esse passo — o
+`prisma migrate deploy` do `docker compose up` já deixa o banco novo pronto.
+
+Depois, configure o Nginx (exemplo em `deploy/nginx/damata.app.conf`):
+
+```bash
+sudo cp deploy/nginx/damata.app.conf /etc/nginx/sites-available/
+sudo ln -s /etc/nginx/sites-available/damata.app.conf /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+
+sudo apt install certbot python3-certbot-nginx   # se ainda não tiver (o ERP já instala)
+sudo certbot --nginx -d damata.app -d www.damata.app
+```
+
+Só então aponte o DNS do domínio raiz/`www` (hoje em `91.195.240.94`) pra
+`163.176.207.111` — atualizar antes disso derrubaria o site atual em produção.
+
+Pra atualizar depois de um `git pull`:
+
+```bash
+docker compose up -d --build
 ```
 
 ## Autenticação
