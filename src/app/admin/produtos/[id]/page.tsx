@@ -70,16 +70,34 @@ export default async function AdminProductEditPage({
             className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
           />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="images" className="font-ui text-xs text-escuro/70">
-            Imagens (uma URL por linha)
-          </label>
-          <textarea
-            id="images"
-            name="images"
-            rows={4}
-            defaultValue={product.images.join("\n")}
-            className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+        <div className="flex flex-col gap-2">
+          <span className="font-ui text-xs text-escuro/70">Imagens</span>
+          {product.images.length > 0 ? (
+            <div className="flex flex-wrap gap-3">
+              {product.images.map((url) => (
+                <label key={url} className="flex flex-col items-center gap-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- remote domains not configured yet */}
+                  <img
+                    src={url}
+                    alt=""
+                    className="h-20 w-20 rounded-lg border border-escuro/14 object-cover"
+                  />
+                  <span className="flex items-center gap-1 font-ui text-[11px] text-escuro/60">
+                    <input type="checkbox" name="keepImages" value={url} defaultChecked />
+                    manter
+                  </span>
+                </label>
+              ))}
+            </div>
+          ) : (
+            <p className="font-ui text-xs text-escuro/50">Nenhuma imagem ainda.</p>
+          )}
+          <input
+            type="file"
+            name="newImages"
+            multiple
+            accept="image/*"
+            className="font-ui text-xs"
           />
         </div>
         <label className="flex items-center gap-2 font-ui text-sm">

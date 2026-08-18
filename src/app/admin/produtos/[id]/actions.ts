@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { uploadProductImage } from "@/lib/r2";
 
 // Only content fields. Name/slug/category/price/stock are owned by the ERP
 // sync (api/sync/product) and are never touched here — see schema.prisma
@@ -17,11 +18,14 @@ export async function updateProductContentAction(
   }
 
   const description = String(formData.get("description") ?? "").trim() || null;
-  const images = String(formData.get("images") ?? "")
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
   const featured = formData.get("featured") === "on";
+
+  const keptImages = formData.getAll("keepImages").map(String);
+  const newFiles = formData
+    .getAll("newImages")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+  const uploadedUrls = await Promise.all(newFiles.map(uploadProductImage));
+  const images = [...keptImages, ...uploadedUrls];
 
   await prisma.product.update({
     where: { id: productId },
