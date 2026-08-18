@@ -1,7 +1,15 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { notifyErpStockMovement } from "@/lib/erp";
+import { notifyErpOrder } from "@/lib/erp";
+
+// O ERP não distingue "cartao" (o site não sabe se foi crédito ou débito) —
+// crédito é o padrão mais comum em pagamento online, assume esse.
+const ERP_PAYMENT_METHOD: Record<string, string> = {
+  pix: "pix",
+  boleto: "boleto",
+  cartao: "cartao_credito",
+};
 
 type MpPayment = {
   id: number | string;
@@ -35,8 +43,10 @@ function isSignatureValid(req: NextRequest): boolean {
 }
 
 // Mercado Pago -> site. Confirms payment, flips Order.status, then notifies
-// the ERP of the stock movement per item. Real preference creation lives in
-// lib/payment.ts (still a stub) — see the note there about external_reference.
+// the ERP so it creates a matching Order there (channel "site") — this is
+// what makes site sales show up in the ERP's revenue/ABC dashboards, not
+// just its stock counts. Real preference creation lives in lib/payment.ts
+// (still a stub) — see the note there about external_reference.
 export async function POST(req: NextRequest) {
   if (!isSignatureValid(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -98,24 +108,31 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  for (const item of order.orderItems) {
-    if (!item.erpVariantId) {
-      console.error(
-        "mercadopago webhook: order item has no erpVariantId, skipping ERP notify",
-        { orderId: order.id, orderItemId: item.id },
-      );
-      continue;
-    }
-    const result = await notifyErpStockMovement({
-      erpVariantId: item.erpVariantId,
-      quantity: item.quantity,
-      reason: "Venda site",
+  const items = order.orderItems
+    .filter((item) => {
+      if (!item.erpVariantId) {
+        console.error(
+          "mercadopago webhook: order item has no erpVariantId, skipping ERP notify",
+          { orderId: order.id, orderItemId: item.id },
+        );
+        return false;
+      }
+      return true;
+    })
+    .map((item) => ({ erpVariantId: item.erpVariantId!, quantity: item.quantity }));
+
+  if (items.length > 0) {
+    const result = await notifyErpOrder({
+      siteOrderId: order.id,
+      customerName: order.customerName,
+      customerPhone: order.customerPhone,
+      paymentMethod: order.paymentMethod ? (ERP_PAYMENT_METHOD[order.paymentMethod] ?? null) : null,
+      shippingCost: order.shippingCost ?? 0,
+      items,
     });
     if (!result.ok) {
       console.error("mercadopago webhook: ERP notify failed, reconcile manually", {
         orderId: order.id,
-        orderItemId: item.id,
-        erpVariantId: item.erpVariantId,
         error: result.error,
       });
     }

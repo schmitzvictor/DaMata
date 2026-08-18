@@ -1,15 +1,25 @@
-type StockMovementInput = {
+type ErpOrderItemInput = {
   erpVariantId: string;
   quantity: number;
-  reason: string;
+};
+
+type ErpOrderInput = {
+  siteOrderId: number;
+  customerName: string | null;
+  customerPhone: string | null;
+  paymentMethod: string | null;
+  shippingCost: number;
+  items: ErpOrderItemInput[];
 };
 
 // Site -> ERP. Fire-and-forget by design: a failure here must never block
 // order confirmation for the customer. Callers should just log the outcome
-// and reconcile manually — see the mercadopago webhook handler.
-export async function notifyErpStockMovement(
-  input: StockMovementInput,
-): Promise<{ ok: true } | { ok: false; error: string }> {
+// and reconcile manually — see the mercadopago webhook handler. Creates a
+// real Order in the ERP (channel "site"), not just a stock movement — shows
+// up in revenue/ABC dashboards there, unlike the old /api/movements call.
+export async function notifyErpOrder(
+  input: ErpOrderInput,
+): Promise<{ ok: true; orderId?: string } | { ok: false; error: string }> {
   const apiUrl = process.env.ERP_API_URL;
   const apiToken = process.env.ERP_API_TOKEN;
   if (!apiUrl || !apiToken) {
@@ -17,23 +27,19 @@ export async function notifyErpStockMovement(
   }
 
   try {
-    const res = await fetch(`${apiUrl}/api/movements`, {
+    const res = await fetch(`${apiUrl}/api/orders/site`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiToken}`,
       },
-      body: JSON.stringify({
-        productId: input.erpVariantId,
-        type: "SAIDA",
-        quantity: input.quantity,
-        reason: input.reason,
-      }),
+      body: JSON.stringify(input),
     });
     if (!res.ok) {
       return { ok: false, error: `ERP responded ${res.status}` };
     }
-    return { ok: true };
+    const data = (await res.json().catch(() => ({}))) as { orderId?: string };
+    return { ok: true, orderId: data.orderId };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
