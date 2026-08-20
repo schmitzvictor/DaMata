@@ -37,7 +37,16 @@ export function ProductCard({
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-[#E6DFD1]">
         <Link href={href} className="absolute inset-0">
-          <ProductImagePlaceholder label={product.name} />
+          {product.images[0] ? (
+            // eslint-disable-next-line @next/next/no-img-element -- remote domains not configured yet
+            <img
+              src={product.images[0]}
+              alt={product.name}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <ProductImagePlaceholder label={product.name} />
+          )}
         </Link>
 
         {badge ? (
