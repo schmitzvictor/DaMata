@@ -2,12 +2,20 @@ import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { checkLoginRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_DURATION_MS = 15 * 60 * 1000;
 
 class AccountLockedError extends CredentialsSignin {
   code = "locked";
+}
+
+// Bloqueio por conta (abaixo) não pega um atacante testando muitos e-mails
+// diferentes — só trava depois de 5 tentativas na MESMA conta. Isso aqui
+// cobre esse caso, por IP.
+class RateLimitedError extends CredentialsSignin {
+  code = "rate-limited";
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -21,11 +29,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "E-mail", type: "email" },
         password: { label: "Senha", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         const email = credentials?.email;
         const password = credentials?.password;
         if (typeof email !== "string" || typeof password !== "string") {
           return null;
+        }
+
+        if (!checkLoginRateLimit(getClientIp(request))) {
+          throw new RateLimitedError();
         }
 
         const user = await prisma.user.findUnique({ where: { email } });

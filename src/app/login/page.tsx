@@ -11,9 +11,11 @@ export default async function LoginPage({
   const errorMessage =
     error === "locked"
       ? "Conta temporariamente bloqueada por excesso de tentativas. Tente novamente em 15 minutos."
-      : error
-        ? "E-mail ou senha inválidos."
-        : null;
+      : error === "rate-limited"
+        ? "Muitas tentativas de login vindas do mesmo lugar. Tente novamente em alguns minutos."
+        : error
+          ? "E-mail ou senha inválidos."
+          : null;
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-6 py-16">

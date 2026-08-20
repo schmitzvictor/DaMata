@@ -21,6 +21,9 @@ export async function loginAction(formData: FormData) {
     if (err instanceof CredentialsSignin && err.code === "locked") {
       redirect("/login?error=locked");
     }
+    if (err instanceof CredentialsSignin && err.code === "rate-limited") {
+      redirect("/login?error=rate-limited");
+    }
     if (err instanceof AuthError) {
       redirect("/login?error=1");
     }
