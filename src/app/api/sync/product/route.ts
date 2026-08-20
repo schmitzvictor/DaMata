@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -108,10 +109,18 @@ function validatePayload(body: unknown): ValidationResult {
   };
 }
 
-export async function POST(req: NextRequest) {
+function isAuthorized(req: NextRequest): boolean {
   const secret = process.env.ERP_SYNC_SECRET;
-  const provided = req.headers.get("x-sync-secret");
-  if (!secret || provided !== secret) {
+  if (!secret) return false;
+
+  const provided = req.headers.get("x-sync-secret") ?? "";
+  const a = Buffer.from(provided);
+  const b = Buffer.from(secret);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+export async function POST(req: NextRequest) {
+  if (!isAuthorized(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
