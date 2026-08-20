@@ -2,26 +2,23 @@
 
 import { useEffect, useState } from "react";
 
-const PROMOS = [
-  "Frete grátis acima de R$ 299 para todo o Brasil",
-  "Até 6x sem juros — ou 5% off no PIX",
-  "Cupom MATA10: 10% na primeira compra",
-];
-
-export function PromoBar() {
+export function PromoBar({ messages }: { messages: string[] }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    if (messages.length <= 1) return;
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % PROMOS.length);
+      setIndex((i) => (i + 1) % messages.length);
     }, 5000);
     return () => clearInterval(id);
-  }, []);
+  }, [messages.length]);
+
+  if (messages.length === 0) return null;
 
   return (
     <div className="flex items-center justify-center gap-3.5 bg-verde-mata px-6 py-2.5 text-center font-ui text-[12.5px] font-medium tracking-wide text-creme">
       <span className="text-[9px] text-verde-claro">◆</span>
-      <span>{PROMOS[index]}</span>
+      <span>{messages[index % messages.length]}</span>
       <span className="text-[9px] text-verde-claro">◆</span>
     </div>
   );

@@ -3,6 +3,7 @@ import { Bebas_Neue, Playfair_Display, Lora, Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart/cart-context";
 import { getCategories } from "@/lib/queries/products";
+import { getContentValue, getSiteContent } from "@/lib/site-content";
 import { PromoBar } from "@/components/store/promo-bar";
 import { SiteHeader } from "@/components/store/site-header";
 import { SiteFooter } from "@/components/store/site-footer";
@@ -52,7 +53,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const categories = await getCategories();
+  const [categories, content] = await Promise.all([
+    getCategories(),
+    getSiteContent(),
+  ]);
+  const promoMessages = getContentValue(content, "promo.messages")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const searchPlaceholder = getContentValue(content, "header.searchPlaceholder");
 
   return (
     <html
@@ -61,8 +70,8 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col font-body bg-creme text-escuro">
         <CartProvider>
-          <PromoBar />
-          <SiteHeader categories={categories} />
+          <PromoBar messages={promoMessages} />
+          <SiteHeader categories={categories} searchPlaceholder={searchPlaceholder} />
           <main className="flex-1">{children}</main>
           <SiteFooter />
           <WhatsAppButton />

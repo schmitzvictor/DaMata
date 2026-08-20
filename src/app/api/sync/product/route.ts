@@ -19,10 +19,10 @@ import { prisma } from "@/lib/prisma";
  * }
  *
  * Product is upserted by erpProductId, writing only name/slug/category/price
- * — the ERP is the source of truth for those. description/images/featured
- * are content-admin curation (see /admin/produtos) and are never touched
- * here, on create or update. Each variant is upserted by erpVariantId,
- * writing size/color/stock.
+ * — the ERP is the source of truth for those. description/images/featured/
+ * isBestSeller are content-admin curation (see /admin/produtos) and are
+ * never touched here, on create or update. Each variant is upserted by
+ * erpVariantId, writing size/color/stock.
  */
 
 type SyncVariant = {
@@ -155,6 +155,7 @@ export async function POST(req: NextRequest) {
         description: null,
         images: [],
         featured: false,
+        isBestSeller: false,
       },
     });
 

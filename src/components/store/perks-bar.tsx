@@ -1,26 +1,24 @@
-const PERKS = [
-  { icon: "▲", title: "Frete grátis", sub: "acima de R$ 299" },
-  { icon: "◈", title: "5% off no PIX", sub: "aprovação na hora" },
-  { icon: "⬒", title: "Até 6x sem juros", sub: "todos os cartões" },
-  { icon: "⟳", title: "Troca grátis", sub: "30 dias, sem stress" },
-];
+import { getContentValue, getSiteContent, parsePairs } from "@/lib/site-content";
 
-export function PerksBar() {
+const ICONS = ["▲", "◈", "⬒", "⟳"];
+
+export async function PerksBar() {
+  const content = await getSiteContent();
+  const perks = parsePairs(getContentValue(content, "home.perks"));
+
   return (
     <section className="bg-escuro px-8 py-6">
       <div className="mx-auto grid max-w-[1400px] grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-7">
-        {PERKS.map((p) => (
-          <div key={p.title} className="flex items-center gap-3.5">
+        {perks.map(([title, sub], i) => (
+          <div key={title} className="flex items-center gap-3.5">
             <span className="w-[26px] text-center text-xl text-verde-claro">
-              {p.icon}
+              {ICONS[i % ICONS.length]}
             </span>
             <div className="flex flex-col">
               <span className="font-ui text-[12.5px] font-bold uppercase tracking-wide text-creme">
-                {p.title}
+                {title}
               </span>
-              <span className="font-ui text-[11.5px] text-creme/60">
-                {p.sub}
-              </span>
+              <span className="font-ui text-[11.5px] text-creme/60">{sub}</span>
             </div>
           </div>
         ))}

@@ -19,15 +19,20 @@ model Product {
   description String?
   price       Float
   category    String
+  // "Destaque" — aparece em Lançamentos. Conceito diferente de
+  // isBestSeller (curadoria editorial vs "mais vendidos") — cada um tem
+  // seu próprio checkbox no admin, não são a mesma coisa.
   featured    Boolean          @default(false)
+  isBestSeller Boolean         @default(false)
   images      String[]
   weightGrams Int? // necessário para cálculo de frete (Melhor Envio)
   createdAt   DateTime         @default(now())
   variants    ProductVariant[]
 
   // ERP é a fonte da verdade para estoque/preço/nome/categoria. Nulo até o
-  // primeiro sync (POST /api/sync/product). description/images/featured
-  // continuam editáveis aqui (admin de conteúdo) e nunca são tocados pelo sync.
+  // primeiro sync (POST /api/sync/product). description/images/featured/
+  // isBestSeller continuam editáveis aqui (admin de conteúdo) e nunca são
+  // tocados pelo sync.
   erpProductId String? @unique
 }
 
@@ -83,6 +88,15 @@ model OrderItem {
   // o webhook de pagamento confirma a venda e registra a saída de estoque.
   // Nulo se o produto nunca foi sincronizado com o ERP.
   erpVariantId String?
+}
+
+// Textos editáveis do site (hero, promo bar, etc.) — chave/valor. Ausência
+// de linha para uma key = usa o fallback hardcoded no componente (ver
+// src/lib/site-content.ts, fonte única desses fallbacks).
+model SiteContent {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 model Post {

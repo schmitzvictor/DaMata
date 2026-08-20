@@ -8,10 +8,10 @@ export type ProductWithVariants = Prisma.ProductGetPayload<{
 
 const withVariants = { variants: true } satisfies Prisma.ProductInclude;
 
-/** "Mais vendidos" — featured products, catalog order. */
+/** "Mais vendidos" — curadoria manual (isBestSeller), catalog order. */
 export function getBestSellers(limit = 5) {
   return prisma.product.findMany({
-    where: { featured: true },
+    where: { isBestSeller: true },
     include: withVariants,
     orderBy: { id: "asc" },
     take: limit,

@@ -19,6 +19,7 @@ export async function updateProductContentAction(
 
   const description = String(formData.get("description") ?? "").trim() || null;
   const featured = formData.get("featured") === "on";
+  const isBestSeller = formData.get("isBestSeller") === "on";
 
   const keptImages = formData.getAll("keepImages").map(String);
   const newFiles = formData
@@ -29,7 +30,7 @@ export async function updateProductContentAction(
 
   await prisma.product.update({
     where: { id: productId },
-    data: { description, images, featured },
+    data: { description, images, featured, isBestSeller },
   });
 
   revalidatePath(`/admin/produtos/${productId}`);

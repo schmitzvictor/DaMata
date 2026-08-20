@@ -103,11 +103,20 @@ export default async function AdminProductEditPage({
         <label className="flex items-center gap-2 font-ui text-sm">
           <input
             type="checkbox"
+            name="isBestSeller"
+            defaultChecked={product.isBestSeller}
+            className="size-4"
+          />
+          Mais Vendidos (aparece na seção &quot;Mais Vendidos&quot; da Home)
+        </label>
+        <label className="flex items-center gap-2 font-ui text-sm">
+          <input
+            type="checkbox"
             name="featured"
             defaultChecked={product.featured}
             className="size-4"
           />
-          Destaque (aparece em &quot;Mais Vendidos&quot;/&quot;Lançamentos&quot; na Home)
+          Destaque (aparece em &quot;Lançamentos&quot; na Home)
         </label>
         <Button type="submit" className="w-fit">
           Salvar

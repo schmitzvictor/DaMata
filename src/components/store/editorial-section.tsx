@@ -1,5 +1,6 @@
 import { ProductImagePlaceholder } from "./product-image-placeholder";
 import type { Post } from "@/generated/prisma/client";
+import { getContentValue, getSiteContent } from "@/lib/site-content";
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
@@ -7,14 +8,16 @@ const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   year: "numeric",
 });
 
-export function EditorialSection({ posts }: { posts: Post[] }) {
+export async function EditorialSection({ posts }: { posts: Post[] }) {
   if (posts.length === 0) return null;
+
+  const content = await getSiteContent();
 
   return (
     <section className="mx-auto max-w-[1400px] px-8 py-22">
       <div className="flex items-end justify-between gap-6 border-b border-escuro/12 pb-4">
         <h2 className="font-editorial text-4xl font-black text-escuro">
-          Do ateliê
+          {getContentValue(content, "home.editorial.heading")}
         </h2>
       </div>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-9 pt-9">
