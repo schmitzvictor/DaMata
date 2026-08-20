@@ -1,13 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
 import type { CategoryLink } from "@/lib/queries/products";
 
-export function SiteHeader({ categories }: { categories: CategoryLink[] }) {
+const MENU_CLOSE_DELAY_MS = 250;
+
+// De propósito, não tem link pro admin aqui — /admin só é acessível pra
+// quem já sabe a URL (login próprio em /login, protegido por lockout de
+// tentativas em src/auth.ts). Não expor esse caminho reduz superfície de
+// descoberta por quem só está navegando a loja.
+export function SiteHeader({
+  categories,
+  searchPlaceholder,
+}: {
+  categories: CategoryLink[];
+  searchPlaceholder: string;
+}) {
   const [megaOpen, setMegaOpen] = useState<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { totalCount, openCart } = useCart();
+
+  function openMenu(slug: string) {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setMegaOpen(slug);
+  }
+
+  // Delay pra dar tempo do mouse atravessar o espaço entre o item do menu e
+  // o painel do submenu sem fechar no meio do caminho.
+  function scheduleClose() {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setMegaOpen(null), MENU_CLOSE_DELAY_MS);
+  }
 
   return (
     <header className="relative z-[60] border-b border-creme/18 bg-verde-mata text-creme">
@@ -25,13 +50,12 @@ export function SiteHeader({ categories }: { categories: CategoryLink[] }) {
         >
           <span className="text-[13px] text-verde-folha">⚲</span>
           <input
-            placeholder="Busque por estampa, coleção ou trilha"
+            placeholder={searchPlaceholder}
             className="flex-1 bg-transparent font-ui text-[13.5px] text-escuro outline-none"
           />
         </form>
 
         <div className="ml-auto flex items-center gap-6.5 font-ui text-xs font-medium tracking-wide">
-          <span className="cursor-default uppercase text-creme/80">Conta</span>
           <button
             type="button"
             onClick={openCart}
@@ -49,8 +73,8 @@ export function SiteHeader({ categories }: { categories: CategoryLink[] }) {
         {categories.map((c) => (
           <div
             key={c.slug}
-            onMouseEnter={() => setMegaOpen(c.slug)}
-            onMouseLeave={() => setMegaOpen(null)}
+            onMouseEnter={() => openMenu(c.slug)}
+            onMouseLeave={scheduleClose}
           >
             <Link
               href={`/categoria/${c.slug}`}
@@ -66,8 +90,8 @@ export function SiteHeader({ categories }: { categories: CategoryLink[] }) {
 
       {megaOpen ? (
         <div
-          onMouseEnter={() => setMegaOpen(megaOpen)}
-          onMouseLeave={() => setMegaOpen(null)}
+          onMouseEnter={() => openMenu(megaOpen)}
+          onMouseLeave={scheduleClose}
           className="animate-in fade-in absolute inset-x-0 top-full border-b-[3px] border-verde-vivo bg-creme text-escuro shadow-[0_24px_40px_rgba(27,27,22,0.18)] duration-150"
         >
           <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-8 px-8 py-9">
