@@ -1,7 +1,14 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCK_DURATION_MS = 15 * 60 * 1000;
+
+class AccountLockedError extends CredentialsSignin {
+  code = "locked";
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -24,8 +31,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) return null;
 
+        const now = new Date();
+        if (user.lockedUntil && user.lockedUntil > now) {
+          throw new AccountLockedError();
+        }
+
         const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) return null;
+        if (!isValid) {
+          // Se havia um bloqueio, ele já expirou (checado acima) — recomeça
+          // a contagem em vez de somar sobre um lockedUntil velho.
+          const attempts = (user.lockedUntil ? 0 : user.loginAttempts) + 1;
+          const locksNow = attempts >= MAX_LOGIN_ATTEMPTS;
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              loginAttempts: attempts,
+              lockedUntil: locksNow
+                ? new Date(now.getTime() + LOCK_DURATION_MS)
+                : null,
+            },
+          });
+          if (locksNow) throw new AccountLockedError();
+          return null;
+        }
+
+        if (user.loginAttempts > 0 || user.lockedUntil) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { loginAttempts: 0, lockedUntil: null },
+          });
+        }
 
         return {
           id: String(user.id),
