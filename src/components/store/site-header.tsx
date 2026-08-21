@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
 import type { CategoryLink } from "@/lib/queries/products";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 
 const MENU_CLOSE_DELAY_MS = 250;
 
@@ -19,6 +20,7 @@ export function SiteHeader({
   searchPlaceholder: string;
 }) {
   const [megaOpen, setMegaOpen] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { totalCount, openCart } = useCart();
 
@@ -36,32 +38,43 @@ export function SiteHeader({
 
   return (
     <header className="relative z-[60] border-b border-creme/18 bg-verde-mata text-creme">
-      <div className="mx-auto flex max-w-[1400px] items-center gap-8 px-8 py-4.5">
+      <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-4 px-4 py-4 md:gap-8 md:px-8 md:py-4.5">
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Abrir menu"
+          className="-ml-2 p-2 text-2xl leading-none md:hidden"
+        >
+          ☰
+        </button>
+
         <Link href="/" className="flex flex-col leading-[0.86]">
-          <span className="font-display text-[34px] tracking-[2.5px]">DA MATA</span>
-          <span className="font-display text-[34px] tracking-[6px] text-verde-claro">
+          <span className="font-display text-[24px] tracking-[1.5px] md:text-[34px] md:tracking-[2.5px]">
+            DA MATA
+          </span>
+          <span className="font-display text-[24px] tracking-[3.5px] text-verde-claro md:text-[34px] md:tracking-[6px]">
             GROW
           </span>
         </Link>
 
         <form
           onSubmit={(e) => e.preventDefault()}
-          className="flex max-w-[520px] flex-1 items-center gap-2.5 bg-creme px-3.5 py-2.5"
+          className="order-2 flex w-full items-center gap-2.5 bg-creme px-3.5 py-2.5 md:order-none md:w-auto md:max-w-[520px] md:flex-1"
         >
           <span className="text-[13px] text-verde-folha">⚲</span>
           <input
             placeholder={searchPlaceholder}
-            className="flex-1 bg-transparent font-ui text-[13.5px] text-escuro outline-none"
+            className="min-w-0 flex-1 bg-transparent font-ui text-[13.5px] text-escuro outline-none"
           />
         </form>
 
-        <div className="ml-auto flex items-center gap-6.5 font-ui text-xs font-medium tracking-wide">
+        <div className="order-1 ml-auto flex items-center gap-6.5 font-ui text-xs font-medium tracking-wide md:order-none">
           <button
             type="button"
             onClick={openCart}
             className="flex cursor-pointer items-center gap-2 uppercase"
           >
-            Carrinho
+            <span className="hidden sm:inline">Carrinho</span>
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-verde-vivo px-1 font-bold text-escuro">
               {totalCount}
             </span>
@@ -69,7 +82,7 @@ export function SiteHeader({
         </div>
       </div>
 
-      <nav className="mx-auto flex max-w-[1400px] gap-8.5 px-8 pb-3.5 font-ui text-[12.5px] font-semibold uppercase tracking-wide">
+      <nav className="mx-auto hidden max-w-[1400px] gap-8.5 px-8 pb-3.5 font-ui text-[12.5px] font-semibold uppercase tracking-wide md:flex">
         {categories.map((c) => (
           <div
             key={c.slug}
@@ -110,6 +123,28 @@ export function SiteHeader({
           </div>
         </div>
       ) : null}
+
+      <Drawer direction="left" open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <DrawerContent className="!w-[min(320px,85%)] gap-0 rounded-none border-none bg-verde-mata p-0 text-creme">
+          <DrawerTitle asChild>
+            <div className="border-b border-creme/15 px-6 py-5 font-display text-2xl tracking-wide">
+              MENU
+            </div>
+          </DrawerTitle>
+          <nav className="flex flex-col p-2">
+            {categories.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/categoria/${c.slug}`}
+                onClick={() => setMobileMenuOpen(false)}
+                className="border-b border-creme/10 px-4 py-4 font-ui text-sm font-semibold uppercase tracking-wide"
+              >
+                {c.label}
+              </Link>
+            ))}
+          </nav>
+        </DrawerContent>
+      </Drawer>
     </header>
   );
 }

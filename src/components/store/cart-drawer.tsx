@@ -52,7 +52,7 @@ export function CartDrawer() {
                   <div className="aspect-[3/4] w-[84px] shrink-0">
                     <ProductImagePlaceholder />
                   </div>
-                  <div className="flex flex-1 flex-col gap-1.5">
+                  <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <span className="font-body text-[15.5px] leading-tight">
                       {item.name}
                     </span>

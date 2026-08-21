@@ -36,7 +36,7 @@ export default function CartPage() {
                 <div className="aspect-[3/4] w-[100px] shrink-0">
                   <ProductImagePlaceholder />
                 </div>
-                <div className="flex flex-1 flex-col gap-1.5">
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                   <Link
                     href={`/produto/${item.slug}`}
                     className="font-body text-lg leading-tight text-escuro"

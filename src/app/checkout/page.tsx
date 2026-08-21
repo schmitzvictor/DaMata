@@ -138,8 +138,8 @@ export default function CheckoutPage() {
         <div className="flex flex-col gap-12">
           <section>
             <h2 className="mb-5 font-editorial text-2xl font-bold">Seus dados</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <label className={`${labelClass} col-span-2`}>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className={`${labelClass} sm:col-span-2`}>
                 Nome completo
                 <input
                   required
@@ -171,8 +171,8 @@ export default function CheckoutPage() {
 
           <section>
             <h2 className="mb-5 font-editorial text-2xl font-bold">Endereço de entrega</h2>
-            <div className="grid grid-cols-6 gap-4">
-              <label className={`${labelClass} col-span-2`}>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-6">
+              <label className={`${labelClass} sm:col-span-2`}>
                 CEP
                 <input
                   required
@@ -182,7 +182,7 @@ export default function CheckoutPage() {
                   onBlur={handleZipBlur}
                 />
               </label>
-              <label className={`${labelClass} col-span-3`}>
+              <label className={`${labelClass} col-span-2 sm:col-span-3`}>
                 Rua
                 <input
                   required
@@ -200,7 +200,7 @@ export default function CheckoutPage() {
                   onChange={(e) => setAddress({ ...address, number: e.target.value })}
                 />
               </label>
-              <label className={`${labelClass} col-span-2`}>
+              <label className={`${labelClass} sm:col-span-2`}>
                 Complemento
                 <input
                   className={inputClass}
@@ -208,7 +208,7 @@ export default function CheckoutPage() {
                   onChange={(e) => setAddress({ ...address, complement: e.target.value })}
                 />
               </label>
-              <label className={`${labelClass} col-span-2`}>
+              <label className={`${labelClass} sm:col-span-2`}>
                 Bairro
                 <input
                   required
@@ -217,7 +217,7 @@ export default function CheckoutPage() {
                   onChange={(e) => setAddress({ ...address, district: e.target.value })}
                 />
               </label>
-              <label className={`${labelClass} col-span-2`}>
+              <label className={`${labelClass} sm:col-span-2`}>
                 Cidade
                 <input
                   required
@@ -244,7 +244,7 @@ export default function CheckoutPage() {
                   ))}
                 </select>
               </label>
-              <label className={`${labelClass} col-span-5`}>
+              <label className={`${labelClass} col-span-2 sm:col-span-5`}>
                 Ponto de referência
                 <input
                   className={inputClass}

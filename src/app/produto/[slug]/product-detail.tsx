@@ -36,7 +36,7 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
       : `${selectedOption.stock <= 6 ? "Últimas " : ""}${selectedOption.stock} peça${selectedOption.stock === 1 ? "" : "s"} no tamanho ${selectedOption.size}.`;
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(360px,1fr))] items-start gap-16 pt-8">
+    <div className="grid grid-cols-1 items-start gap-10 pt-8 md:grid-cols-[repeat(auto-fit,minmax(360px,1fr))] md:gap-16">
       <div className="flex min-w-0 items-start gap-4">
         {hasImages && product.images.length > 1 ? (
           <div className="flex w-[84px] shrink-0 flex-col gap-3">

@@ -56,7 +56,7 @@ export function ProductCard({
         ) : null}
 
         <div
-          className={`absolute inset-x-0 bottom-0 flex justify-center gap-1.5 bg-escuro/85 p-3 transition-transform duration-300 ${
+          className={`absolute inset-x-0 bottom-0 flex justify-center gap-1.5 bg-escuro/85 p-3 transition-transform duration-300 max-md:translate-y-0 ${
             hovered ? "translate-y-0" : "translate-y-full"
           }`}
         >
