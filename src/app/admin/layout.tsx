@@ -17,9 +17,9 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="mx-auto max-w-[1240px] px-8 py-9">
-      <nav className="mb-8 flex items-center justify-between border-b border-escuro/14 pb-4">
-        <div className="flex items-center gap-6">
+    <div className="mx-auto max-w-[1240px] px-4 py-9 sm:px-8">
+      <nav className="mb-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-escuro/14 pb-4">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <span className="font-display text-xl tracking-wide">ADMIN</span>
           <Link
             href="/admin/produtos"
@@ -41,7 +41,9 @@ export default async function AdminLayout({
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <span className="font-ui text-xs text-escuro/60">{session.user.email}</span>
+          <span className="hidden font-ui text-xs text-escuro/60 sm:inline">
+            {session.user.email}
+          </span>
           <form action={logoutAction}>
             <button
               type="submit"

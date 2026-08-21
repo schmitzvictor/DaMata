@@ -29,7 +29,7 @@ export default async function AdminProductEditPage({
         sobrescrito no próximo sync.
       </p>
 
-      <section className="mb-8 grid grid-cols-2 gap-4 border border-escuro/14 bg-creme/40 p-5 font-ui text-sm">
+      <section className="mb-8 grid grid-cols-1 gap-4 border border-escuro/14 bg-creme/40 p-5 font-ui text-sm sm:grid-cols-2">
         <ReadonlyField label="Nome (ERP)" value={product.name} />
         <ReadonlyField label="Categoria (ERP)" value={product.category} />
         <ReadonlyField label="Preço (ERP)" value={formatBRL(product.price)} />
@@ -37,7 +37,7 @@ export default async function AdminProductEditPage({
           label="Sincronização"
           value={product.erpProductId ? `id ${product.erpProductId}` : "não sincronizado"}
         />
-        <div className="col-span-2">
+        <div className="sm:col-span-2">
           <span className="mb-1 block text-xs text-escuro/60">Estoque por variante (ERP)</span>
           <div className="flex flex-wrap gap-2">
             {product.variants.length === 0 ? (
