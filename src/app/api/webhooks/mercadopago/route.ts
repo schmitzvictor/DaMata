@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { notifyErpOrder } from "@/lib/erp";
+import { sendOrderConfirmedEmail, sendNewSaleNotification } from "@/lib/email";
 
 // O ERP não distingue "cartao" (o site não sabe se foi crédito ou débito) —
 // crédito é o padrão mais comum em pagamento online, assume esse.
@@ -107,6 +108,8 @@ export async function POST(req: NextRequest) {
       paymentId: String(payment.id),
     },
   });
+
+  await Promise.all([sendOrderConfirmedEmail(order), sendNewSaleNotification(order)]);
 
   const items = order.orderItems
     .filter((item) => {
