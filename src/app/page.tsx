@@ -1,56 +1,72 @@
 import Link from "next/link";
 import { getBestSellers, getLaunches } from "@/lib/queries/products";
-import { getRecentPosts } from "@/lib/queries/posts";
 import { ProductCard } from "@/components/store/product-card";
 import { PerksBar } from "@/components/store/perks-bar";
 import { B2BBlock } from "@/components/store/b2b-block";
-import { EditorialSection } from "@/components/store/editorial-section";
-import { getContentValue, getSiteContent, parsePairs } from "@/lib/site-content";
+import {
+  BannerCarousel,
+  type BannerSlide,
+} from "@/components/store/banner-carousel";
+import { InstagramGrid } from "@/components/store/instagram-grid";
+import { Reveal } from "@/components/store/reveal";
+import { getContentValue, getSiteContent } from "@/lib/site-content";
 
 export default async function Home() {
-  const [bestSellers, launches, posts, content] = await Promise.all([
+  const [bestSellers, launches, content] = await Promise.all([
     getBestSellers(5),
     getLaunches(4),
-    getRecentPosts(3),
     getSiteContent(),
   ]);
   const c = (key: string) => getContentValue(content, key);
-  const stats = parsePairs(c("home.process.stats"));
+
+  const slides: BannerSlide[] = [
+    {
+      src: "/banner-1.jpg",
+      alt: "Estampa botânica impressa à mão em tecido natural",
+      title: c("home.hero.heading"),
+      cta: c("home.hero.cta"),
+      href: "/categoria/camisetas",
+    },
+    {
+      src: "/banner-2.jpg",
+      alt: "Peças de linho com estampa de folhagem dobradas no ateliê",
+      title: c("home.hero.eyebrow"),
+    },
+    {
+      src: "/banner-3.jpg",
+      alt: "Modelo vestindo camiseta com estampa de floresta",
+      title: "Feito à mão, na mata.",
+      cta: "Ver serigrafia",
+      href: "/serigrafia",
+    },
+  ];
 
   return (
     <div>
-      <section className="relative flex min-h-[82vh] items-end overflow-hidden bg-[repeating-linear-gradient(150deg,#25400F_0_22px,#2D5016_22px_44px)]">
-        <div className="absolute inset-0 bg-linear-to-t from-escuro/88 via-escuro/25 to-escuro/45" />
-        <div className="relative mx-auto w-full max-w-[1400px] px-8 pb-24">
-          <span className="font-ui text-[11px] font-semibold uppercase tracking-[3px] text-verde-claro">
-            {c("home.hero.eyebrow")}
-          </span>
-          <h1 className="mt-4.5 max-w-[16ch] font-display text-[clamp(56px,9vw,132px)] leading-[0.9] tracking-wide text-creme">
-            {c("home.hero.heading")}
-          </h1>
-          <p className="my-5 max-w-[52ch] font-body text-lg leading-relaxed text-creme/85">
-            {c("home.hero.subtext")}
-          </p>
-          <div className="flex flex-wrap gap-3.5">
-            <Link
-              href="/categoria/camisetas"
-              className="bg-verde-vivo px-9 py-4 font-display text-[22px] tracking-wide text-escuro"
-            >
-              {c("home.hero.cta")}
-            </Link>
-          </div>
-        </div>
-      </section>
+      <BannerCarousel slides={slides} />
 
       <PerksBar />
 
+      <section className="mx-auto max-w-[1400px] px-5 py-24 md:px-10">
+        <Reveal className="max-w-3xl">
+          <p className="text-xs uppercase tracking-[0.28em] text-verde-folha">
+            {c("home.hero.eyebrow")}
+          </p>
+          <p className="mt-6 font-display text-3xl leading-snug md:text-5xl">
+            {c("home.hero.subtext")}
+          </p>
+        </Reveal>
+      </section>
+
       {bestSellers.length > 0 ? (
-        <section className="mx-auto max-w-[1400px] px-8 pt-22">
-          <div className="flex items-end justify-between gap-6 border-b border-escuro/12 pb-4">
-            <h2 className="font-display text-[58px] tracking-wide">
-              {c("home.bestsellers.heading")}
-            </h2>
-          </div>
+        <section className="mx-auto max-w-[1400px] px-5 pb-20 md:px-10">
+          <Reveal>
+            <div className="flex items-end justify-between gap-6 border-b border-escuro/12 pb-4">
+              <h2 className="font-display text-4xl md:text-5xl">
+                {c("home.bestsellers.heading")}
+              </h2>
+            </div>
+          </Reveal>
           <div className="flex gap-6.5 overflow-x-auto py-8">
             {bestSellers.map((p) => (
               <ProductCard
@@ -65,15 +81,17 @@ export default async function Home() {
       ) : null}
 
       {launches.length > 0 ? (
-        <section className="mx-auto max-w-[1400px] px-8 py-22">
-          <div className="flex items-end justify-between gap-6 border-b border-escuro/12 pb-4">
-            <h2 className="font-display text-[58px] tracking-wide">
-              {c("home.launches.heading")}
-            </h2>
-            <span className="font-body text-base italic text-escuro/60">
-              {c("home.launches.subtext")}
-            </span>
-          </div>
+        <section className="mx-auto max-w-[1400px] px-5 py-20 md:px-10">
+          <Reveal>
+            <div className="flex items-end justify-between gap-6 border-b border-escuro/12 pb-4">
+              <h2 className="font-display text-4xl md:text-5xl">
+                {c("home.launches.heading")}
+              </h2>
+              <span className="font-body text-base italic text-escuro/60">
+                {c("home.launches.subtext")}
+              </span>
+            </div>
+          </Reveal>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-9 pt-9">
             {launches.map((p) => (
               <ProductCard key={p.id} product={p} />
@@ -82,41 +100,52 @@ export default async function Home() {
         </section>
       ) : null}
 
-      <B2BBlock />
-
-      <section className="mt-22 bg-verde-mata px-8 py-24">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-2 items-center gap-18 max-lg:grid-cols-1">
-          <div>
-            <span className="font-ui text-[11px] font-semibold uppercase tracking-[3px] text-verde-claro">
-              {c("home.process.eyebrow")}
-            </span>
-            <h2 className="my-5 font-editorial text-[clamp(34px,4.4vw,58px)] font-black leading-tight text-creme">
-              {c("home.process.heading")}
-            </h2>
-            <p className="mb-4.5 font-body text-lg leading-loose text-creme/85">
-              {c("home.process.paragraph")}
-            </p>
-            <p className="mb-7.5 font-body text-lg italic leading-loose text-verde-claro">
-              &quot;{c("home.process.quote")}&quot;
-            </p>
-            <div className="flex flex-wrap gap-11">
-              {stats.map(([n, label]) => (
-                <div key={label}>
-                  <span className="block font-display text-5xl leading-none text-sol">
-                    {n}
-                  </span>
-                  <span className="font-ui text-[11px] uppercase tracking-wide text-creme/70">
-                    {label}
-                  </span>
-                </div>
-              ))}
+      <section className="mx-auto grid max-w-[1400px] gap-10 px-5 pb-24 md:grid-cols-12 md:px-10">
+        <Reveal rotate={-1.5} className="md:col-span-7">
+          <Link href="/serigrafia" className="group block overflow-hidden">
+            <div className="aspect-[4/5] overflow-hidden bg-secondary">
+              {/* eslint-disable-next-line @next/next/no-img-element -- local brand asset */}
+              <img
+                src="/serigrafia.jpg"
+                alt="Telas de serigrafia e potes de tinta terracota e verde sobre bancada de madeira"
+                className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              />
             </div>
-          </div>
-          <div className="relative flex aspect-[4/5] items-end bg-[repeating-linear-gradient(135deg,#3C6725_0_14px,#446F29_14px_28px)] p-4" />
-        </div>
+            <h2 className="mt-6 text-4xl md:text-5xl">Serigrafia</h2>
+            <p className="mt-3 max-w-md text-escuro/70">
+              O processo camada por camada: gravação da tela, mistura das tintas e
+              a impressão manual de cada peça.
+            </p>
+            <span className="mt-4 inline-flex items-center gap-2 text-sm uppercase tracking-[0.14em] text-verde-mata">
+              ver o processo <span aria-hidden>→</span>
+            </span>
+          </Link>
+        </Reveal>
+
+        <Reveal rotate={1.5} delay={140} className="md:col-span-5 md:pt-24">
+          <Link href="/sobre" className="group block overflow-hidden">
+            <div className="aspect-[4/5] overflow-hidden bg-secondary">
+              {/* eslint-disable-next-line @next/next/no-img-element -- local brand asset */}
+              <img
+                src="/atelier.jpg"
+                alt="Duas artesãs conferindo um tecido estampado no ateliê cheio de plantas"
+                className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+            </div>
+            <h2 className="mt-6 text-4xl md:text-5xl">Sobre nós</h2>
+            <p className="mt-3 text-escuro/70">
+              Duas mãos, um ateliê pequeno e a mata como referência de forma e cor.
+            </p>
+            <span className="mt-4 inline-flex items-center gap-2 text-sm uppercase tracking-[0.14em] text-verde-mata">
+              nossa história <span aria-hidden>→</span>
+            </span>
+          </Link>
+        </Reveal>
       </section>
 
-      <EditorialSection posts={posts} />
+      <B2BBlock />
+
+      <InstagramGrid />
     </div>
   );
 }

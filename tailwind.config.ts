@@ -1,9 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       colors: {
@@ -11,7 +9,7 @@ export default {
         "verde-folha": "#4A7C2F",
         "verde-vivo": "#6BAF3C",
         "verde-claro": "#A8D96B",
-        terra: "#8B4513",
+        terra: "#A85D3E",
         sol: "#E8C547",
         creme: "#F5F0E8",
         escuro: "#1B1B16",

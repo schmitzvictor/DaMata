@@ -50,10 +50,10 @@ export function SiteHeader({
 
         <Link href="/" className="flex flex-col leading-[0.86]">
           <span className="font-display text-[24px] tracking-[1.5px] md:text-[34px] md:tracking-[2.5px]">
-            DA MATA
+            Da Mata
           </span>
           <span className="font-display text-[24px] tracking-[3.5px] text-verde-claro md:text-[34px] md:tracking-[6px]">
-            GROW
+            grow
           </span>
         </Link>
 
@@ -99,6 +99,18 @@ export function SiteHeader({
             </Link>
           </div>
         ))}
+        <Link
+          href="/serigrafia"
+          className="cursor-pointer border-b-2 border-transparent pb-1.5 text-creme transition-colors hover:text-verde-claro"
+        >
+          Serigrafia
+        </Link>
+        <Link
+          href="/sobre"
+          className="cursor-pointer border-b-2 border-transparent pb-1.5 text-creme transition-colors hover:text-verde-claro"
+        >
+          Sobre nós
+        </Link>
       </nav>
 
       {megaOpen ? (
@@ -142,6 +154,20 @@ export function SiteHeader({
                 {c.label}
               </Link>
             ))}
+            <Link
+              href="/serigrafia"
+              onClick={() => setMobileMenuOpen(false)}
+              className="border-b border-creme/10 px-4 py-4 font-ui text-sm font-semibold uppercase tracking-wide"
+            >
+              Serigrafia
+            </Link>
+            <Link
+              href="/sobre"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-4 py-4 font-ui text-sm font-semibold uppercase tracking-wide"
+            >
+              Sobre nós
+            </Link>
           </nav>
         </DrawerContent>
       </Drawer>
