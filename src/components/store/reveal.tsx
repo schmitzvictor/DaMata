@@ -58,7 +58,6 @@ export function Reveal({
 
   return (
     <Tag
-      // @ts-expect-error -- ref typing varies by element tag
       ref={ref}
       className={`reveal-base ${className}`.trim()}
       style={style}
