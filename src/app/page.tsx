@@ -62,7 +62,7 @@ export default async function Home() {
         <section className="mx-auto max-w-[1400px] px-5 pb-20 md:px-10">
           <Reveal>
             <div className="flex items-end justify-between gap-6 border-b border-escuro/12 pb-4">
-              <h2 className="font-display text-4xl md:text-5xl">
+              <h2 className="font-heading text-4xl md:text-5xl">
                 {c("home.bestsellers.heading")}
               </h2>
             </div>
@@ -72,7 +72,6 @@ export default async function Home() {
               <ProductCard
                 key={p.id}
                 product={p}
-                quickBuyButton
                 className="w-[300px] shrink-0"
               />
             ))}
@@ -84,7 +83,7 @@ export default async function Home() {
         <section className="mx-auto max-w-[1400px] px-5 py-20 md:px-10">
           <Reveal>
             <div className="flex items-end justify-between gap-6 border-b border-escuro/12 pb-4">
-              <h2 className="font-display text-4xl md:text-5xl">
+              <h2 className="font-heading text-4xl md:text-5xl">
                 {c("home.launches.heading")}
               </h2>
               <span className="font-body text-base italic text-escuro/60">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Work_Sans } from "next/font/google";
+import { Archivo_Black, Instrument_Serif, Work_Sans } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart/cart-context";
 import { getCategories } from "@/lib/queries/products";
@@ -16,6 +16,13 @@ const fontDisplay = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],
+});
+
+// font-heading — Archivo Black: section titles ("Mais vendidos", etc.)
+const fontHeading = Archivo_Black({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 // font-body / font-ui — Work Sans: long-form copy and UI chrome
@@ -54,7 +61,7 @@ export default async function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${fontDisplay.variable} ${fontBody.variable} h-full antialiased`}
+      className={`${fontDisplay.variable} ${fontHeading.variable} ${fontBody.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-body bg-creme text-escuro">
         <CartProvider>

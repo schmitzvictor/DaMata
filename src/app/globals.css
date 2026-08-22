@@ -10,7 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-body);
   --font-mono: ui-monospace, monospace;
-  --font-heading: var(--font-display);
+  --font-heading: var(--font-heading);
   --font-display: var(--font-display);
   --font-editorial: var(--font-display);
   --font-body: var(--font-body);
@@ -150,5 +150,15 @@
       opacity: 1;
       transition: none;
     }
+  }
+}
+
+/* Section/page titles use Archivo Black; editorial body copy stays serif. */
+@layer utilities {
+  h1.font-display,
+  h2.font-display {
+    font-family: var(--font-heading);
+    letter-spacing: -0.01em;
+    line-height: 1.05;
   }
 }

@@ -17,11 +17,9 @@ function isNew(createdAt: Date) {
 
 export function ProductCard({
   product,
-  quickBuyButton = false,
   className,
 }: {
   product: ProductWithVariants;
-  quickBuyButton?: boolean;
   className?: string;
 }) {
   const [hovered, setHovered] = useState(false);
@@ -95,15 +93,6 @@ export function ProductCard({
         <span className="font-ui text-[11.5px] text-escuro/55">
           {formatInstallment(product.price)}
         </span>
-
-        {quickBuyButton ? (
-          <Link
-            href={href}
-            className="mt-2 border border-verde-mata py-2.5 text-center font-display text-[17px] tracking-wide text-verde-mata"
-          >
-            COMPRA RÁPIDA
-          </Link>
-        ) : null}
       </div>
     </div>
   );
