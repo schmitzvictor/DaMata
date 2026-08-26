@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
+import { trackEvent } from "@/lib/analytics/track";
 import { formatBRL, formatInstallment } from "@/lib/format";
 import { ProductImagePlaceholder } from "./product-image-placeholder";
 import { VariantSelector } from "./variant-selector";
@@ -64,7 +65,7 @@ export function ProductCard({
             variants={product.variants}
             size="compact"
             tone="dark"
-            onSelect={(opt) =>
+            onSelect={(opt) => {
               addItem({
                 variantId: opt.variantId,
                 productId: product.id,
@@ -74,8 +75,9 @@ export function ProductCard({
                 color: null,
                 price: product.price,
                 image: product.images[0] ?? null,
-              })
-            }
+              });
+              trackEvent({ type: "click", label: "add_to_cart", productId: product.id });
+            }}
           />
         </div>
       </div>
@@ -99,6 +101,7 @@ export function ProductCard({
         {quickBuyButton ? (
           <Link
             href={href}
+            data-track="quick_buy"
             className="mt-2 border border-verde-mata py-2.5 text-center font-display text-[17px] tracking-wide text-verde-mata"
           >
             COMPRA RÁPIDA

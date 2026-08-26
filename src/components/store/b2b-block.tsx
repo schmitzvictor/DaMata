@@ -23,6 +23,7 @@ export async function B2BBlock() {
           href={WHATSAPP_LINK}
           target="_blank"
           rel="noreferrer"
+          data-track="b2b_cta"
           className="bg-sol px-11 py-[19px] text-center font-display text-2xl tracking-wide text-escuro"
         >
           {c("home.b2b.cta")}

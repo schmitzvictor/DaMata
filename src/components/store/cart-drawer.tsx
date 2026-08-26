@@ -114,6 +114,7 @@ export function CartDrawer() {
           <Link
             href="/checkout"
             onClick={closeCart}
+            data-track="cart_checkout"
             className="block w-full bg-verde-vivo py-[18px] text-center font-display text-2xl tracking-wide text-escuro"
           >
             FINALIZAR COMPRA

@@ -124,3 +124,24 @@ model Setting {
   key   String @id
   value String // JSON stringificado
 }
+
+// Eventos de analytics próprios (sem terceiros) — pageview, clique em CTA,
+// visualização de produto. Sem PII: sessionId é um id aleatório guardado só
+// em sessionStorage do navegador (reseta a cada sessão, não é cookie
+// persistente). Consumido agregado pelo ERP via /api/analytics/summary.
+model AnalyticsEvent {
+  id          Int      @id @default(autoincrement())
+  type        String // "pageview" | "click" | "product_view"
+  path        String?
+  referrer    String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  label       String? // identifica o botão/CTA em eventos "click"
+  productId   Int?
+  sessionId   String
+  createdAt   DateTime @default(now())
+
+  @@index([type, createdAt])
+  @@index([productId])
+}

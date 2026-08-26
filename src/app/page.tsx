@@ -34,6 +34,7 @@ export default async function Home() {
           <div className="flex flex-wrap gap-3.5">
             <Link
               href="/categoria/camisetas"
+              data-track="hero_cta"
               className="bg-verde-vivo px-9 py-4 font-display text-[22px] tracking-wide text-escuro"
             >
               {c("home.hero.cta")}

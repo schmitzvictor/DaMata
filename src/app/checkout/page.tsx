@@ -367,6 +367,7 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={isPending}
+            data-track="checkout_confirm"
             className="w-full cursor-pointer bg-verde-vivo py-[19px] font-display text-2xl tracking-wide text-escuro disabled:opacity-60"
           >
             {isPending ? "ENVIANDO…" : "CONFIRMAR PEDIDO"}

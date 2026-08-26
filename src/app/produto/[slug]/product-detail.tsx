@@ -12,6 +12,7 @@ import { ProductImagePlaceholder } from "@/components/store/product-image-placeh
 import { VariantSelector } from "@/components/store/variant-selector";
 import { sizeOptionsFor } from "@/lib/variants";
 import { useCart } from "@/lib/cart/cart-context";
+import { trackEvent } from "@/lib/analytics/track";
 import { formatBRL, formatInstallment } from "@/lib/format";
 import type { ProductWithVariants } from "@/lib/queries/products";
 
@@ -107,8 +108,8 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
           <Button
             size="lg"
             disabled={!selectedOption || selectedOption.stock === 0}
-            onClick={() =>
-              selectedOption &&
+            onClick={() => {
+              if (!selectedOption) return;
               addItem({
                 variantId: selectedOption.variantId,
                 productId: product.id,
@@ -118,8 +119,9 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
                 color: null,
                 price: product.price,
                 image: product.images[0] ?? null,
-              })
-            }
+              });
+              trackEvent({ type: "click", label: "add_to_cart", productId: product.id });
+            }}
             className="h-auto flex-1 basis-[260px] rounded-none bg-verde-vivo py-[19px] font-display text-2xl tracking-wide text-escuro hover:bg-verde-vivo/90"
           >
             ADICIONAR AO CARRINHO

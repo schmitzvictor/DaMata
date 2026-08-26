@@ -4,6 +4,7 @@ import { getProductBySlug, getRelatedProducts } from "@/lib/queries/products";
 import { ProductCard } from "@/components/store/product-card";
 import { slugify } from "@/lib/slug";
 import { ProductDetail } from "./product-detail";
+import { ProductViewTracker } from "@/components/store/product-view-tracker";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -26,6 +27,7 @@ export default async function ProductPage({ params }: Props) {
         <span className="text-escuro">{product.name}</span>
       </div>
 
+      <ProductViewTracker productId={product.id} />
       <ProductDetail product={product} />
 
       {related.length > 0 ? (

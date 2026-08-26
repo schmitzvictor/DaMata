@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/store/site-header";
 import { SiteFooter } from "@/components/store/site-footer";
 import { WhatsAppButton } from "@/components/store/whatsapp-button";
 import { CartDrawer } from "@/components/store/cart-drawer";
+import { AnalyticsTracker } from "@/components/store/analytics-tracker";
 
 // font-display — Bebas Neue: headlines, all-caps display type
 const fontDisplay = Bebas_Neue({
@@ -70,6 +71,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col font-body bg-creme text-escuro">
         <CartProvider>
+          <AnalyticsTracker />
           <PromoBar messages={promoMessages} />
           <SiteHeader categories={categories} searchPlaceholder={searchPlaceholder} />
           <main className="flex-1">{children}</main>
