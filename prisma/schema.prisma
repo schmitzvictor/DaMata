@@ -125,6 +125,17 @@ model Setting {
   value String // JSON stringificado
 }
 
+// Slides do carrossel do banner da home — editável em /admin/banner.
+// `order` define a ordem de exibição (crescente); sem índice único porque a
+// reordenação troca dois valores de uma vez, não precisa ser sequencial.
+model HeroSlide {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String
+  href      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
 // Eventos de analytics próprios (sem terceiros) — pageview, clique em CTA,
 // visualização de produto. Sem PII: sessionId é um id aleatório guardado só
 // em sessionStorage do navegador (reseta a cada sessão, não é cookie

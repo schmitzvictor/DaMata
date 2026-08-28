@@ -1,21 +1,17 @@
 import Link from "next/link";
 import { getBestSellers, getLaunches } from "@/lib/queries/products";
+import { getHeroSlides } from "@/lib/queries/hero-slides";
 import { ProductCard } from "@/components/store/product-card";
 import { PerksBar } from "@/components/store/perks-bar";
 import { B2BBlock } from "@/components/store/b2b-block";
 import { HeroCarousel } from "@/components/store/hero-carousel";
 import { getContentValue, getSiteContent, parsePairs } from "@/lib/site-content";
 
-const HERO_SLIDES = [
-  { src: "https://picsum.photos/seed/damata-hero-1/1600/1000", href: "/categoria/camisetas" },
-  { src: "https://picsum.photos/seed/damata-hero-2/1600/1000", href: "/categoria/calcas" },
-  { src: "https://picsum.photos/seed/damata-hero-3/1600/1000", href: "/categoria/acessorios" },
-];
-
 export default async function Home() {
-  const [bestSellers, launches, content] = await Promise.all([
+  const [bestSellers, launches, heroSlides, content] = await Promise.all([
     getBestSellers(5),
     getLaunches(4),
+    getHeroSlides(),
     getSiteContent(),
   ]);
   const c = (key: string) => getContentValue(content, key);
@@ -24,7 +20,9 @@ export default async function Home() {
   return (
     <div>
       <section className="relative flex min-h-[82vh] items-end overflow-hidden bg-verde-mata">
-        <HeroCarousel slides={HERO_SLIDES} />
+        <HeroCarousel
+          slides={heroSlides.map((s) => ({ src: s.imageUrl, href: s.href }))}
+        />
         <div className="absolute inset-0 bg-linear-to-t from-escuro/88 via-escuro/25 to-escuro/45" />
         <div className="relative mx-auto w-full max-w-[1400px] px-8 pb-24">
           <span className="font-ui text-[11px] font-semibold uppercase tracking-[3px] text-verde-claro">

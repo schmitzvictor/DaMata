@@ -60,7 +60,7 @@ function sniffImage(bytes: Buffer) {
   return IMAGE_SIGNATURES.find((sig) => sig.matches(bytes)) ?? null;
 }
 
-export async function uploadProductImage(file: File): Promise<string> {
+async function uploadImage(file: File, folder: string): Promise<string> {
   const publicUrl = process.env.R2_PUBLIC_URL;
   if (!publicUrl) {
     throw new Error("R2_PUBLIC_URL não configurada — veja .env.example.");
@@ -78,7 +78,7 @@ export async function uploadProductImage(file: File): Promise<string> {
     );
   }
 
-  const key = `products/${randomUUID()}.${sniffed.ext}`;
+  const key = `${folder}/${randomUUID()}.${sniffed.ext}`;
 
   await client.send(
     new PutObjectCommand({
@@ -90,4 +90,12 @@ export async function uploadProductImage(file: File): Promise<string> {
   );
 
   return `${publicUrl}/${key}`;
+}
+
+export function uploadProductImage(file: File): Promise<string> {
+  return uploadImage(file, "products");
+}
+
+export function uploadBannerImage(file: File): Promise<string> {
+  return uploadImage(file, "banners");
 }

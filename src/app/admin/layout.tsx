@@ -39,6 +39,12 @@ export default async function AdminLayout({
           >
             Conteúdo
           </Link>
+          <Link
+            href="/admin/banner"
+            className="font-ui text-sm text-escuro/70 hover:text-escuro"
+          >
+            Banner
+          </Link>
         </div>
         <div className="flex items-center gap-4">
           <span className="hidden font-ui text-xs text-escuro/60 sm:inline">
