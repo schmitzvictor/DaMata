@@ -6,10 +6,10 @@ import { B2BBlock } from "@/components/store/b2b-block";
 import { HeroCarousel } from "@/components/store/hero-carousel";
 import { getContentValue, getSiteContent, parsePairs } from "@/lib/site-content";
 
-const HERO_IMAGES = [
-  "https://picsum.photos/seed/damata-hero-1/1600/1000",
-  "https://picsum.photos/seed/damata-hero-2/1600/1000",
-  "https://picsum.photos/seed/damata-hero-3/1600/1000",
+const HERO_SLIDES = [
+  { src: "https://picsum.photos/seed/damata-hero-1/1600/1000", href: "/categoria/camisetas" },
+  { src: "https://picsum.photos/seed/damata-hero-2/1600/1000", href: "/categoria/calcas" },
+  { src: "https://picsum.photos/seed/damata-hero-3/1600/1000", href: "/categoria/acessorios" },
 ];
 
 export default async function Home() {
@@ -24,7 +24,7 @@ export default async function Home() {
   return (
     <div>
       <section className="relative flex min-h-[82vh] items-end overflow-hidden bg-verde-mata">
-        <HeroCarousel images={HERO_IMAGES} />
+        <HeroCarousel slides={HERO_SLIDES} />
         <div className="absolute inset-0 bg-linear-to-t from-escuro/88 via-escuro/25 to-escuro/45" />
         <div className="relative mx-auto w-full max-w-[1400px] px-8 pb-24">
           <span className="font-ui text-[11px] font-semibold uppercase tracking-[3px] text-verde-claro">
@@ -59,12 +59,7 @@ export default async function Home() {
           </div>
           <div className="flex gap-6.5 overflow-x-auto py-8">
             {bestSellers.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                quickBuyButton
-                className="w-[300px] shrink-0"
-              />
+              <ProductCard key={p.id} product={p} className="w-[300px] shrink-0" />
             ))}
           </div>
         </section>
