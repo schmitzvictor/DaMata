@@ -60,6 +60,18 @@ export async function createOrderAction(input: CreateOrderInput) {
     if (!variant || requested.quantity < 1) {
       throw new Error("Item de carrinho inválido.");
     }
+    // Best-effort, not a hard guarantee: variant.stock is a cache synced
+    // from the ERP (see api/sync/product), so it can be a few seconds
+    // stale, and this doesn't reserve the stock either — two checkouts
+    // started at the same instant can both pass this check. It narrows the
+    // overselling window instead of closing it; the ERP's own atomic
+    // decrement in applyStockOutflow (lib/orders.ts) is what actually
+    // prevents negative stock when the sale is confirmed there.
+    if (variant.stock < requested.quantity) {
+      throw new Error(
+        `${variant.product.name} (${variant.size}) tem só ${variant.stock} em estoque.`,
+      );
+    }
     return { variant, quantity: requested.quantity };
   });
 
@@ -93,8 +105,10 @@ export async function createOrderAction(input: CreateOrderInput) {
     shippingOptions[0];
   const total = subtotal + (shipping?.cost ?? 0);
 
-  // NOTE: this does not decrement ProductVariant.stock — inventory is not
-  // debited on checkout yet. Flagged in the review summary.
+  // Still doesn't decrement ProductVariant.stock here — only checked above.
+  // The actual debit happens in the ERP once Mercado Pago confirms payment
+  // (api/webhooks/mercadopago -> notifyErpOrder -> damata-erp's
+  // applyStockOutflow), which is also where negative stock is prevented.
   const order = await prisma.order.create({
     data: {
       customerName: input.customer.name,
