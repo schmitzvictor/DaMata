@@ -89,6 +89,7 @@ Abra [http://localhost:3000](http://localhost:3000).
 | `npm run lint`         | ESLint                                   |
 | `npx prisma studio`    | UI para inspecionar o banco              |
 | `npx prisma generate`  | regenera o client (roda automático no `npm install` via `postinstall`) |
+| `npm run analytics:prune` | remove eventos de `AnalyticsEvent` com mais de `ANALYTICS_RETENTION_DAYS` dias (padrão 180) — ver "Deploy em produção" |
 
 ## Estrutura de pastas
 
@@ -171,6 +172,20 @@ Pra atualizar depois de um `git pull`:
 ```bash
 docker compose up -d --build
 ```
+
+### Retenção de analytics
+
+`/api/track` é público e grava um `AnalyticsEvent` a cada pageview/clique —
+sem limpeza periódica a tabela (e seus índices) cresce indefinidamente.
+Agendar via cron na VM (diário, fora do horário de pico):
+
+```bash
+crontab -e
+# adicionar:
+0 4 * * * cd /caminho/pra/damata-marketplace && npm run analytics:prune >> /var/log/damata-analytics-prune.log 2>&1
+```
+
+Retenção padrão: 180 dias. Ajustável via `ANALYTICS_RETENTION_DAYS` no `.env`.
 
 ## Autenticação
 
