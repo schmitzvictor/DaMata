@@ -39,6 +39,12 @@ export const checkLoginRateLimit = createRateLimiter(10 * 60 * 1000, 20);
 export const checkTrackRateLimit = createRateLimiter(60 * 1000, 120);
 
 export function getClientIp(request: Request): string {
+  // X-Forwarded-For é enviado pelo cliente e pode ser forjado (o Nginx só
+  // concatena o IP real ao final, não substitui); X-Real-IP é setado pelo
+  // Nginx a partir de $remote_addr e não pode ser sobrescrito pelo cliente
+  // (deploy/nginx/damata.app.conf), então é a fonte confiável de IP aqui.
+  const realIp = request.headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
   const forwarded = request.headers.get("x-forwarded-for");
   return forwarded?.split(",")[0]?.trim() || "unknown";
 }
