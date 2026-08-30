@@ -7,9 +7,13 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+// `new PrismaPg(...)` opens a pg.Pool immediately, so it must only run when
+// actually constructing a client — building it unconditionally above the `??`
+// created (and leaked) a fresh Postgres connection pool on every hot-reload
+// even though the pool went unused whenever a cached client already existed.
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
