@@ -4,22 +4,22 @@ import { CONTACT_EMAIL, WHATSAPP_DISPLAY } from "@/lib/site-config";
 
 const STORE_LINKS = ["Camisetas", "Moletons", "Jaquetas", "Acessórios"];
 
-const FOOTER_COLS = [
-  { title: "Loja", links: STORE_LINKS },
-  {
-    title: "Institucional",
-    links: [
-      "Nossa história",
-      "O processo",
-      "Guia de medidas",
-      "Trocas e devoluções",
-      "Política de privacidade",
-    ],
-  },
-  {
-    title: "Atendimento",
-    links: [`WhatsApp ${WHATSAPP_DISPLAY}`, CONTACT_EMAIL, "Seg a sex, 9h às 18h", "B2B e times"],
-  },
+// Só "Trocas e devoluções" e "Política de privacidade" têm página própria
+// por enquanto — as demais entradas de "Institucional" ficam como texto
+// solto até existir conteúdo pra elas.
+const INSTITUTIONAL_LINKS: { label: string; href?: string }[] = [
+  { label: "Nossa história" },
+  { label: "O processo" },
+  { label: "Guia de medidas" },
+  { label: "Trocas e devoluções", href: "/trocas-e-devolucoes" },
+  { label: "Política de privacidade", href: "/politica-de-privacidade" },
+];
+
+const ATENDIMENTO_LINKS = [
+  `WhatsApp ${WHATSAPP_DISPLAY}`,
+  CONTACT_EMAIL,
+  "Seg a sex, 9h às 18h",
+  "B2B e times",
 ];
 
 export function SiteFooter() {
@@ -44,28 +44,52 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {FOOTER_COLS.map((col) => (
-          <div key={col.title} className="flex flex-col gap-2.5">
-            <span className="mb-1 font-ui text-[10.5px] font-bold uppercase tracking-[2px] text-sol">
-              {col.title}
+        <div className="flex flex-col gap-2.5">
+          <span className="mb-1 font-ui text-[10.5px] font-bold uppercase tracking-[2px] text-sol">
+            Loja
+          </span>
+          {STORE_LINKS.map((label) => (
+            <Link
+              key={label}
+              href={`/categoria/${slugify(label)}`}
+              className="font-ui text-[13.5px] text-creme/75 hover:text-verde-claro"
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-2.5">
+          <span className="mb-1 font-ui text-[10.5px] font-bold uppercase tracking-[2px] text-sol">
+            Institucional
+          </span>
+          {INSTITUTIONAL_LINKS.map(({ label, href }) =>
+            href ? (
+              <Link
+                key={label}
+                href={href}
+                className="font-ui text-[13.5px] text-creme/75 hover:text-verde-claro"
+              >
+                {label}
+              </Link>
+            ) : (
+              <span key={label} className="font-ui text-[13.5px] text-creme/75">
+                {label}
+              </span>
+            ),
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2.5">
+          <span className="mb-1 font-ui text-[10.5px] font-bold uppercase tracking-[2px] text-sol">
+            Atendimento
+          </span>
+          {ATENDIMENTO_LINKS.map((label) => (
+            <span key={label} className="font-ui text-[13.5px] text-creme/75">
+              {label}
             </span>
-            {col.links.map((label) =>
-              col.title === "Loja" ? (
-                <Link
-                  key={label}
-                  href={`/categoria/${slugify(label)}`}
-                  className="font-ui text-[13.5px] text-creme/75 hover:text-verde-claro"
-                >
-                  {label}
-                </Link>
-              ) : (
-                <span key={label} className="font-ui text-[13.5px] text-creme/75">
-                  {label}
-                </span>
-              ),
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       <div className="mx-auto mt-11 flex max-w-[1400px] flex-wrap justify-between gap-5 border-t border-creme/15 pt-5 font-ui text-[11.5px] text-creme/50">
         <span>© 2026 Da Mata Grow · CNPJ 00.000.000/0001-00</span>
