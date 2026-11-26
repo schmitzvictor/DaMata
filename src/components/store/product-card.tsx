@@ -7,6 +7,7 @@ import { trackEvent } from "@/lib/analytics/track";
 import { formatBRL, formatInstallment } from "@/lib/format";
 import { ProductImagePlaceholder } from "./product-image-placeholder";
 import { VariantSelector } from "./variant-selector";
+import { colorOptionsFor } from "@/lib/variants";
 import type { ProductWithVariants } from "@/lib/queries/products";
 
 const NEW_WINDOW_DAYS = 14;
@@ -27,6 +28,8 @@ export function ProductCard({
   const { addItem } = useCart();
   const href = `/produto/${product.slug}`;
   const badge = isNew(product.createdAt) ? "Novo" : null;
+  // Com mais de uma cor, adicionar só pelo tamanho escolheria a cor sozinho.
+  const colorCount = colorOptionsFor(product.variants).length;
 
   return (
     <div
@@ -59,24 +62,30 @@ export function ProductCard({
             hovered ? "translate-y-0" : "translate-y-full"
           }`}
         >
-          <VariantSelector
-            variants={product.variants}
-            size="compact"
-            tone="dark"
-            onSelect={(opt) => {
-              addItem({
-                variantId: opt.variantId,
-                productId: product.id,
-                slug: product.slug,
-                name: product.name,
-                size: opt.size,
-                color: null,
-                price: product.price,
-                image: product.images[0] ?? null,
-              });
-              trackEvent({ type: "click", label: "add_to_cart", productId: product.id });
-            }}
-          />
+          {colorCount > 1 ? (
+            <Link href={href} className="py-1.5 font-ui text-[11.5px] font-semibold uppercase tracking-wide text-creme underline">
+              {colorCount} cores · escolher
+            </Link>
+          ) : (
+            <VariantSelector
+              variants={product.variants}
+              size="compact"
+              tone="dark"
+              onSelect={(opt) => {
+                addItem({
+                  variantId: opt.variantId,
+                  productId: product.id,
+                  slug: product.slug,
+                  name: product.name,
+                  size: opt.size,
+                  color: opt.color,
+                  price: product.price,
+                  image: product.images[0] ?? null,
+                });
+                trackEvent({ type: "click", label: "add_to_cart", productId: product.id });
+              }}
+            />
+          )}
         </div>
       </div>
 

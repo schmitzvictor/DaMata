@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ProductImagePlaceholder } from "@/components/store/product-image-placeholder";
 import { VariantSelector } from "@/components/store/variant-selector";
-import { sizeOptionsFor } from "@/lib/variants";
+import { colorOptionsFor, sizeOptionsFor } from "@/lib/variants";
 import { useCart } from "@/lib/cart/cart-context";
 import { trackEvent } from "@/lib/analytics/track";
 import { formatBRL, formatInstallment } from "@/lib/format";
@@ -18,9 +18,18 @@ import type { ProductWithVariants } from "@/lib/queries/products";
 
 export function ProductDetail({ product }: { product: ProductWithVariants }) {
   const [activeImage, setActiveImage] = useState(0);
-  const options = useMemo(
-    () => sizeOptionsFor(product.variants),
+  const colors = useMemo(
+    () => colorOptionsFor(product.variants),
     [product.variants],
+  );
+  // Já começa na primeira cor com estoque; o rótulo "Cor: X" deixa visível.
+  const [selectedColor, setSelectedColor] = useState<string | null>(
+    colors[0]?.key ?? null,
+  );
+  const colorLabel = colors.find((c) => c.key === selectedColor)?.label;
+  const options = useMemo(
+    () => sizeOptionsFor(product.variants, selectedColor),
+    [product.variants, selectedColor],
   );
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
     null,
@@ -28,6 +37,15 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
   const { addItem } = useCart();
 
   const selectedOption = options.find((o) => o.variantId === selectedVariantId);
+
+  // Mantém o tamanho ao trocar de cor, se ele existir na cor nova.
+  function pickColor(key: string) {
+    const next = sizeOptionsFor(product.variants, key).find(
+      (o) => o.size === selectedOption?.size && o.available,
+    );
+    setSelectedColor(key);
+    setSelectedVariantId(next?.variantId ?? null);
+  }
   const hasImages = product.images.length > 0;
 
   const stockNote = !selectedOption
@@ -86,6 +104,32 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
           {formatInstallment(product.price)}
         </span>
 
+        {colors.length > 0 ? (
+          <div className="mt-8.5">
+            <span className="font-ui text-[11.5px] font-semibold uppercase tracking-wide">
+              Cor: {colorLabel}
+            </span>
+            <div className="mt-3.5 flex flex-wrap gap-2.5">
+              {colors.map((c) => (
+                <button
+                  key={c.key}
+                  type="button"
+                  aria-pressed={c.key === selectedColor}
+                  disabled={!c.available}
+                  onClick={() => pickColor(c.key)}
+                  className={`min-h-11 cursor-pointer border px-3.5 font-ui text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:border-escuro/20 disabled:text-escuro/30 disabled:line-through ${
+                    c.key === selectedColor
+                      ? "border-verde-vivo bg-verde-vivo text-escuro"
+                      : "border-escuro/30 text-escuro hover:border-verde-vivo"
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className="mt-8.5">
           <div className="flex items-baseline justify-between">
             <span className="font-ui text-[11.5px] font-semibold uppercase tracking-wide">
@@ -95,6 +139,7 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
           <div className="mt-3.5">
             <VariantSelector
               variants={product.variants}
+              color={selectedColor}
               selectedVariantId={selectedVariantId}
               onSelect={(opt) => setSelectedVariantId(opt.variantId)}
             />
@@ -116,7 +161,7 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
                 slug: product.slug,
                 name: product.name,
                 size: selectedOption.size,
-                color: null,
+                color: selectedOption.color,
                 price: product.price,
                 image: product.images[0] ?? null,
               });
@@ -180,6 +225,7 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
                   product.weightGrams ? `${product.weightGrams} g` : "—",
                 ],
                 ["Tamanhos", options.map((o) => o.size).join(", ") || "—"],
+                ["Cores", colors.map((c) => c.label).join(", ") || "—"],
               ].map(([k, v]) => (
                 <div
                   key={k}

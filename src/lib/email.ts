@@ -4,6 +4,7 @@ import { formatBRL } from "@/lib/format";
 type EmailOrderItem = {
   productName: string;
   size: string;
+  color: string | null;
   quantity: number;
   price: number;
 };
@@ -54,7 +55,7 @@ function itemsHtml(items: EmailOrderItem[]): string {
     .map(
       (item) => `
       <tr>
-        <td style="padding:8px 0;border-bottom:1px solid #e5e0d8;">${item.productName} (${item.size})</td>
+        <td style="padding:8px 0;border-bottom:1px solid #e5e0d8;">${item.productName} (${[item.color, item.size].filter(Boolean).join(", ")})</td>
         <td style="padding:8px 0;border-bottom:1px solid #e5e0d8;text-align:center;">${item.quantity}x</td>
         <td style="padding:8px 0;border-bottom:1px solid #e5e0d8;text-align:right;">${formatBRL(item.price * item.quantity)}</td>
       </tr>`,

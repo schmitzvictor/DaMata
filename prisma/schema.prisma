@@ -80,6 +80,7 @@ model OrderItem {
   productId   Int?
   productName String
   size        String
+  color       String?
   quantity    Int
   price       Float
 

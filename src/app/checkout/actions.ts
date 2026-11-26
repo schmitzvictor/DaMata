@@ -74,7 +74,7 @@ export async function createOrderAction(input: CreateOrderInput) {
     // prevents negative stock when the sale is confirmed there.
     if (variant.stock < requested.quantity) {
       throw new Error(
-        `${variant.product.name} (${variant.size}) tem só ${variant.stock} em estoque.`,
+        `${variant.product.name} (${[variant.color, variant.size].filter(Boolean).join(", ")}) tem só ${variant.stock} em estoque.`,
       );
     }
     return { variant, quantity: requested.quantity };
@@ -84,6 +84,7 @@ export async function createOrderAction(input: CreateOrderInput) {
     productId: variant.productId,
     productName: variant.product.name,
     size: variant.size,
+    color: variant.color,
     quantity,
     price: variant.product.price,
     // Snapshot for the ERP stock-movement notification on payment

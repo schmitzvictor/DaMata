@@ -376,7 +376,7 @@ export default function CheckoutPage() {
             {items.map((i) => (
               <div key={i.variantId} className="flex justify-between gap-3">
                 <span className="text-creme/85">
-                  {i.name} · Tam. {i.size} · {i.quantity}un.
+                  {i.name}{i.color ? ` · ${i.color}` : ""} · Tam. {i.size} · {i.quantity}un.
                 </span>
                 <span className="shrink-0 font-semibold">
                   {formatBRL(i.price * i.quantity)}

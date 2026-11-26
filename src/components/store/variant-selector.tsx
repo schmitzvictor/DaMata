@@ -6,6 +6,8 @@ import type { ProductVariant } from "@/generated/prisma/client";
 
 type Props = {
   variants: ProductVariant[];
+  /** Chave de cor (colorKey) quando o produto tem cores. */
+  color?: string | null;
   selectedVariantId?: number | null;
   onSelect: (option: SizeOption) => void;
   /** compact = 32px chips for card quick-add; default = 54px PDP buttons. */
@@ -16,12 +18,13 @@ type Props = {
 
 export function VariantSelector({
   variants,
+  color,
   selectedVariantId,
   onSelect,
   size = "default",
   tone = "light",
 }: Props) {
-  const options = sizeOptionsFor(variants);
+  const options = sizeOptionsFor(variants, color);
   const compact = size === "compact";
 
   return (
