@@ -1,5 +1,6 @@
 "use server";
 
+import { lookupCep, type CepAddress } from "@/lib/cep";
 import { prisma } from "@/lib/prisma";
 import { calculateShipping, type ShippingOption } from "@/lib/shipping";
 import { createPaymentPreference, type PaymentMethod } from "@/lib/payment";
@@ -20,6 +21,10 @@ export type CreateOrderInput = {
   paymentMethod: PaymentMethod;
   items: { variantId: number; quantity: number }[];
 };
+
+export async function lookupCepAction(zip: string): Promise<CepAddress | null> {
+  return lookupCep(zip);
+}
 
 export async function quoteShippingAction(
   zip: string,

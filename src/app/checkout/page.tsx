@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
 import { formatBRL } from "@/lib/format";
 import type { ShippingOption } from "@/lib/shipping";
 import type { PaymentMethod } from "@/lib/payment";
-import { createOrderAction, quoteShippingAction } from "./actions";
+import { createOrderAction, lookupCepAction, quoteShippingAction } from "./actions";
 
 const inputClass =
   "border border-escuro/25 bg-[#FFFDF9] px-3.5 py-3.5 font-ui text-sm outline-none focus:border-verde-mata";
@@ -49,7 +49,38 @@ export default function CheckoutPage() {
   const [shippingMethod, setShippingMethod] = useState<string | null>(null);
   const [quoting, setQuoting] = useState(false);
 
+  // Último CEP consultado: evita repetir a busca (e apagar o que a pessoa
+  // corrigiu à mão) e descarta resposta atrasada de um CEP já trocado.
+  const lastCep = useRef("");
+  const [cepStatus, setCepStatus] = useState<"idle" | "loading" | "notFound">("idle");
+
+  async function fillFromCep(zip: string) {
+    const digits = zip.replace(/\D/g, "");
+    if (digits.length !== 8 || digits === lastCep.current) return;
+    const replacing = lastCep.current !== "";
+    lastCep.current = digits;
+    setCepStatus("loading");
+
+    const found = await lookupCepAction(digits).catch(() => null);
+    if (lastCep.current !== digits) return;
+    if (!found) {
+      setCepStatus("notFound");
+      return;
+    }
+    setCepStatus("idle");
+    // Campo que o CEP não informa: mantém o digitado na primeira busca; ao
+    // trocar de CEP, limpa pra não sobrar rua do endereço anterior.
+    setAddress((a) => ({
+      ...a,
+      street: found.street || (replacing ? "" : a.street),
+      district: found.district || (replacing ? "" : a.district),
+      city: found.city,
+      state: found.state,
+    }));
+  }
+
   async function handleZipBlur() {
+    void fillFromCep(address.zip);
     if (!address.zip) return;
     setQuoting(true);
     try {
@@ -177,10 +208,24 @@ export default function CheckoutPage() {
                 <input
                   required
                   className={inputClass}
+                  inputMode="numeric"
+                  autoComplete="postal-code"
+                  maxLength={9}
                   value={address.zip}
-                  onChange={(e) => setAddress({ ...address, zip: e.target.value })}
+                  onChange={(e) => {
+                    const zip = e.target.value;
+                    setAddress((a) => ({ ...a, zip }));
+                    void fillFromCep(zip);
+                  }}
                   onBlur={handleZipBlur}
                 />
+                {cepStatus !== "idle" ? (
+                  <span role="status" className="font-ui text-[11px] normal-case tracking-normal text-terra">
+                    {cepStatus === "loading"
+                      ? "Buscando endereço…"
+                      : "CEP não encontrado, preencha à mão."}
+                  </span>
+                ) : null}
               </label>
               <label className={`${labelClass} col-span-2 sm:col-span-3`}>
                 Rua

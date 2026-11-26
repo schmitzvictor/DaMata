@@ -72,6 +72,9 @@ export default function PoliticaDePrivacidadePage() {
               <strong>Mercado Pago</strong> — processamento do pagamento.
             </li>
             <li>
+              <strong>ViaCEP</strong> — recebe só o CEP digitado, pra preencher o endereço.
+            </li>
+            <li>
               <strong>Resend</strong> — envio dos e-mails de confirmação e status do pedido.
             </li>
             <li>
