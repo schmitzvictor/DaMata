@@ -16,11 +16,8 @@ export const CONTENT_SECTIONS: { title: string; fields: ContentField[] }[] = [
         key: "promo.messages",
         label: "Mensagens (uma por linha — alternam a cada 5s)",
         type: "textarea",
-        fallback: [
-          "Frete grátis acima de R$ 299 para todo o Brasil",
-          "Até 6x sem juros — ou 5% off no PIX",
-          "Cupom MATA10: 10% na primeira compra",
-        ].join("\n"),
+        // Só anunciar o que o checkout realmente cumpre.
+        fallback: "Frete grátis acima de R$ 299 para todo o Brasil",
       },
     ],
   },
@@ -56,7 +53,7 @@ export const CONTENT_SECTIONS: { title: string; fields: ContentField[] }[] = [
     ],
   },
   {
-    title: "Página inicial — Vantagens (4 itens)",
+    title: "Página inicial — Vantagens",
     fields: [
       {
         key: "home.perks",
@@ -64,8 +61,6 @@ export const CONTENT_SECTIONS: { title: string; fields: ContentField[] }[] = [
         type: "textarea",
         fallback: [
           "Frete grátis | acima de R$ 299",
-          "5% off no PIX | aprovação na hora",
-          "Até 6x sem juros | todos os cartões",
           "Troca grátis | 30 dias, sem stress",
         ].join("\n"),
       },
