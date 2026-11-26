@@ -19,6 +19,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
 ENV NEXT_TELEMETRY_DISABLED=1
+# headers() do next.config.ts é avaliado no build: sem isto o CSP sai sem a
+# origem do R2 e todas as fotos são bloqueadas.
+ARG R2_PUBLIC_URL
+ENV R2_PUBLIC_URL=$R2_PUBLIC_URL
 RUN npm run build
 
 # --- migrate: reaproveita o builder (já tem o Prisma Client gerado, o

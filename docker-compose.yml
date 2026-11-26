@@ -5,6 +5,8 @@ services:
     build:
       context: .
       target: migrate
+      args:
+        R2_PUBLIC_URL: ${R2_PUBLIC_URL}
     env_file: .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -15,6 +17,8 @@ services:
     build:
       context: .
       target: runner
+      args:
+        R2_PUBLIC_URL: ${R2_PUBLIC_URL}
     restart: unless-stopped
     env_file: .env
     environment:

@@ -38,6 +38,9 @@ const cspHeader = `
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Padrão do Next é 1MB — fotos de produto/banner aceitam até 5MB (r2.ts).
+  // O teto fica abaixo do client_max_body_size 10m do Nginx.
+  experimental: { serverActions: { bodySizeLimit: "9mb" } },
   async headers() {
     return [
       {
