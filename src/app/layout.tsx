@@ -75,7 +75,7 @@ export default async function RootLayout({
           <PromoBar messages={promoMessages} />
           <SiteHeader categories={categories} searchPlaceholder={searchPlaceholder} />
           <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <SiteFooter categories={categories} />
           <WhatsAppButton />
           <CartDrawer />
         </CartProvider>

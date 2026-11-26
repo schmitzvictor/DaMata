@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart/cart-context";
 import type { CategoryLink } from "@/lib/queries/products";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
@@ -23,6 +24,13 @@ export function SiteHeader({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { totalCount, openCart } = useCart();
+  const router = useRouter();
+
+  function search(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const q = String(new FormData(e.currentTarget).get("q") ?? "").trim();
+    router.push(q ? `/colecao?q=${encodeURIComponent(q)}` : "/colecao");
+  }
 
   function openMenu(slug: string) {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -58,11 +66,18 @@ export function SiteHeader({
         </Link>
 
         <form
-          onSubmit={(e) => e.preventDefault()}
+          role="search"
+          action="/colecao"
+          onSubmit={search}
           className="order-2 flex w-full items-center gap-2.5 bg-creme px-3.5 py-2.5 md:order-none md:w-auto md:max-w-[520px] md:flex-1"
         >
-          <span className="text-[13px] text-verde-folha">⚲</span>
+          <button type="submit" aria-label="Buscar" className="cursor-pointer text-[13px] text-verde-folha">
+            ⚲
+          </button>
           <input
+            type="search"
+            name="q"
+            aria-label="Buscar produtos"
             placeholder={searchPlaceholder}
             className="min-w-0 flex-1 bg-transparent font-ui text-[13.5px] text-escuro outline-none"
           />

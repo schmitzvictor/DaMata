@@ -1,28 +1,25 @@
 import Link from "next/link";
-import { slugify } from "@/lib/slug";
-import { CONTACT_EMAIL, WHATSAPP_DISPLAY } from "@/lib/site-config";
+import { CONTACT_EMAIL, WHATSAPP_DISPLAY, WHATSAPP_LINK } from "@/lib/site-config";
+import type { CategoryLink } from "@/lib/queries/products";
 
-const STORE_LINKS = ["Camisetas", "Moletons", "Jaquetas", "Acessórios"];
-
-// Só "Trocas e devoluções" e "Política de privacidade" têm página própria
-// por enquanto — as demais entradas de "Institucional" ficam como texto
-// solto até existir conteúdo pra elas.
-const INSTITUTIONAL_LINKS: { label: string; href?: string }[] = [
-  { label: "Nossa história" },
-  { label: "O processo" },
-  { label: "Guia de medidas" },
+// Só entra aqui o que tem destino. "Nossa história" e "Guia de medidas"
+// voltam quando houver conteúdo; redes sociais, quando houver os links.
+const INSTITUTIONAL_LINKS = [
+  { label: "O processo", href: "/#processo" },
   { label: "Trocas e devoluções", href: "/trocas-e-devolucoes" },
   { label: "Política de privacidade", href: "/politica-de-privacidade" },
 ];
 
-const ATENDIMENTO_LINKS = [
-  `WhatsApp ${WHATSAPP_DISPLAY}`,
-  CONTACT_EMAIL,
-  "Seg a sex, 9h às 18h",
-  "B2B e times",
+const ATENDIMENTO_LINKS: { label: string; href?: string }[] = [
+  { label: `WhatsApp ${WHATSAPP_DISPLAY}`, href: WHATSAPP_LINK },
+  { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
+  { label: "Seg a sex, 9h às 18h" },
+  { label: "B2B e times", href: WHATSAPP_LINK },
 ];
 
-export function SiteFooter() {
+const linkClass = "font-ui text-[13.5px] text-creme/75 hover:text-verde-claro";
+
+export function SiteFooter({ categories }: { categories: CategoryLink[] }) {
   return (
     <footer className="mt-0 bg-escuro px-8 pb-8 pt-18 text-creme">
       <div className="mx-auto grid max-w-[1400px] grid-cols-[1.4fr_1fr_1fr_1fr] gap-11 max-md:grid-cols-1">
@@ -37,24 +34,18 @@ export function SiteFooter() {
             Serigrafia autoral e roupa de trilha, feitas à mão em
             Florianópolis desde 2019.
           </p>
-          <div className="mt-5 flex gap-3.5 font-ui text-[11.5px] uppercase tracking-wide text-verde-claro">
-            <span>Instagram</span>
-            <span>TikTok</span>
-            <span>YouTube</span>
-          </div>
         </div>
 
         <div className="flex flex-col gap-2.5">
           <span className="mb-1 font-ui text-[10.5px] font-bold uppercase tracking-[2px] text-sol">
             Loja
           </span>
-          {STORE_LINKS.map((label) => (
-            <Link
-              key={label}
-              href={`/categoria/${slugify(label)}`}
-              className="font-ui text-[13.5px] text-creme/75 hover:text-verde-claro"
-            >
-              {label}
+          <Link href="/colecao" className={linkClass}>
+            Toda a coleção
+          </Link>
+          {categories.map((c) => (
+            <Link key={c.slug} href={`/categoria/${c.slug}`} className={linkClass}>
+              {c.label}
             </Link>
           ))}
         </div>
@@ -63,32 +54,33 @@ export function SiteFooter() {
           <span className="mb-1 font-ui text-[10.5px] font-bold uppercase tracking-[2px] text-sol">
             Institucional
           </span>
-          {INSTITUTIONAL_LINKS.map(({ label, href }) =>
-            href ? (
-              <Link
-                key={label}
-                href={href}
-                className="font-ui text-[13.5px] text-creme/75 hover:text-verde-claro"
-              >
-                {label}
-              </Link>
-            ) : (
-              <span key={label} className="font-ui text-[13.5px] text-creme/75">
-                {label}
-              </span>
-            ),
-          )}
+          {INSTITUTIONAL_LINKS.map(({ label, href }) => (
+            <Link key={label} href={href} className={linkClass}>
+              {label}
+            </Link>
+          ))}
         </div>
 
         <div className="flex flex-col gap-2.5">
           <span className="mb-1 font-ui text-[10.5px] font-bold uppercase tracking-[2px] text-sol">
             Atendimento
           </span>
-          {ATENDIMENTO_LINKS.map((label) => (
-            <span key={label} className="font-ui text-[13.5px] text-creme/75">
-              {label}
-            </span>
-          ))}
+          {ATENDIMENTO_LINKS.map(({ label, href }) =>
+            href ? (
+              <a
+                key={label}
+                href={href}
+                {...(href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
+                className={linkClass}
+              >
+                {label}
+              </a>
+            ) : (
+              <span key={label} className="font-ui text-[13.5px] text-creme/75">
+                {label}
+              </span>
+            ),
+          )}
         </div>
       </div>
       <div className="mx-auto mt-11 flex max-w-[1400px] flex-wrap justify-between gap-5 border-t border-creme/15 pt-5 font-ui text-[11.5px] text-creme/50">

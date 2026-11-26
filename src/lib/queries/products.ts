@@ -83,3 +83,19 @@ export function getRelatedProducts(
     take: limit,
   });
 }
+
+/** Busca por nome, categoria e descrição, ignorando acentos e maiúsculas
+ *  ("termica" acha "Térmica"). Todas as palavras precisam aparecer. Filtra em
+ *  memória porque o catálogo é pequeno; com busca vazia devolve tudo. */
+export async function searchProducts(query: string) {
+  const products = await prisma.product.findMany({
+    include: withVariants,
+    orderBy: { createdAt: "desc" },
+  });
+  const terms = slugify(query).split("-").filter(Boolean);
+  if (terms.length === 0) return products;
+  return products.filter((p) => {
+    const text = slugify(`${p.name} ${p.category} ${p.description ?? ""}`);
+    return terms.every((t) => text.includes(t));
+  });
+}

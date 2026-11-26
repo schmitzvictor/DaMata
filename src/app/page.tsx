@@ -36,7 +36,7 @@ export default async function Home() {
           </p>
           <div className="flex flex-wrap gap-3.5">
             <Link
-              href="/categoria/camisetas"
+              href="/colecao"
               data-track="hero_cta"
               className="bg-verde-vivo px-9 py-4 font-display text-[22px] tracking-wide text-escuro"
             >
@@ -83,7 +83,7 @@ export default async function Home() {
 
       <B2BBlock />
 
-      <section className="mt-22 bg-verde-mata px-8 py-24">
+      <section id="processo" className="mt-22 bg-verde-mata px-8 py-24">
         <div className="mx-auto grid max-w-[1400px] grid-cols-2 items-center gap-18 max-lg:grid-cols-1">
           <div>
             <span className="font-ui text-[11px] font-semibold uppercase tracking-[3px] text-verde-claro">

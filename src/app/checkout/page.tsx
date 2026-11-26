@@ -116,7 +116,7 @@ export default function CheckoutPage() {
           Adicione alguma peça antes de finalizar a compra.
         </p>
         <Link
-          href="/"
+          href="/colecao"
           className="mt-8 inline-block bg-verde-vivo px-9 py-3.5 font-display text-xl tracking-wide text-escuro"
         >
           VER A COLEÇÃO

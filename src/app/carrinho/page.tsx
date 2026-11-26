@@ -22,7 +22,7 @@ export default function CartPage() {
             Seu carrinho está vazio.
           </p>
           <Link
-            href="/"
+            href="/colecao"
             className="inline-block bg-verde-vivo px-9 py-3.5 font-display text-xl tracking-wide text-escuro"
           >
             VER A COLEÇÃO
